@@ -1,0 +1,13 @@
+{
+  "name": "screencast-storyboard--gate",
+  "skill": "screencast-storyboard",
+  "fixture": "mock-mcp-tool",
+  "prompt": "Script a short tutorial that shows how to add this MCP server in Claude Code. The server's README and config are in this repo.",
+  "max_turns": 6,
+  "smoke": true,
+  "allowed_tools_extra": ["Write"],
+  "expectations": [
+    { "type": "output_matches", "pattern": "STORYBOARD READY FOR APPROVAL" },
+    { "type": "file_not_created", "pattern": "**/tutorial.mp4" }
+  ]
+}

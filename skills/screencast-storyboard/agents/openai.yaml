@@ -1,0 +1,7 @@
+# OpenAI Codex invocation policy for this skill.
+# allow_implicit_invocation: whether Codex may invoke the skill without the
+# user naming it explicitly. Authoring is low-risk (it only drafts a
+# storyboard.md and stops at an approval gate), so implicit invocation is
+# allowed.
+policy:
+  allow_implicit_invocation: true

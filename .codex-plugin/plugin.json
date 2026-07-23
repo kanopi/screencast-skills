@@ -1,0 +1,22 @@
+{
+  "name": "screencast-skills",
+  "version": "1.0.0",
+  "description": "Author and produce narrated screencast tutorials for AI tooling and any developer workflow. screencast-storyboard scripts a tutorial: it reads the real docs and drafts an approved storyboard (transcript + timeline). screencast-tutorial-video produces the video: it records each scene with the right engine (VHS terminal, ffmpeg still-motion for native apps, Playwright + cliclick for the browser, command cards) and assembles a voice-over, captioned 1920x1080 MP4. Works in Claude Code, Claude Desktop, and OpenAI Codex.",
+  "author": {
+    "name": "Kanopi Studios",
+    "email": "code@kanopi.com",
+    "url": "https://kanopi.com"
+  },
+  "homepage": "https://github.com/kanopi/screencast-skills",
+  "repository": "https://github.com/kanopi/screencast-skills",
+  "license": "MIT",
+  "keywords": ["kanopi", "codex", "screencast", "tutorial-video"],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Screencast Skills",
+    "shortDescription": "Script and produce narrated, captioned screencast tutorials for AI tooling on macOS",
+    "developerName": "Kanopi Studios",
+    "category": "Development",
+    "websiteURL": "https://github.com/kanopi/screencast-skills"
+  }
+}

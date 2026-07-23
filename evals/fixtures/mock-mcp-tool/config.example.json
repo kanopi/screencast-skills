@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "mock-weather": {
+      "command": "npx",
+      "args": ["-y", "@example/mock-weather-mcp"]
+    }
+  }
+}

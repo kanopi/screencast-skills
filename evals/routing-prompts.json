@@ -1,0 +1,37 @@
+{
+  "$comment": "Routing eval cases for scripts/run-evals.js. Each case is a realistic user prompt plus the skill that should win the TF-IDF ranking against every skill description in this repo. The two skills split on scope: authoring/planning ('script', 'draft', 'outline', 'transcript', 'timeline', 'plan') routes to screencast-storyboard; production/output ('record', 'produce', 'render', 'MP4', 'voice-over', 'captions') routes to screencast-tutorial-video. CI enforces --min-rank1 75.",
+  "prompts": [
+    {
+      "prompt": "help me script a tutorial showing how to add an MCP server in Claude Desktop",
+      "expect": "screencast-storyboard"
+    },
+    {
+      "prompt": "draft the transcript and timeline for a demo of setting up Claude Code",
+      "expect": "screencast-storyboard"
+    },
+    {
+      "prompt": "outline a screencast walkthrough covering this MCP install before we record anything",
+      "expect": "screencast-storyboard"
+    },
+    {
+      "prompt": "plan the storyboard for a walkthrough of using an MCP server in Claude Desktop",
+      "expect": "screencast-storyboard"
+    },
+    {
+      "prompt": "record the screencast from my approved storyboard",
+      "expect": "screencast-tutorial-video"
+    },
+    {
+      "prompt": "produce the narrated MP4 for this tutorial with a caption bar",
+      "expect": "screencast-tutorial-video"
+    },
+    {
+      "prompt": "render the tutorial video with voice-over and captions from the storyboard",
+      "expect": "screencast-tutorial-video"
+    },
+    {
+      "prompt": "cut the screencast scenes together into the final video file",
+      "expect": "screencast-tutorial-video"
+    }
+  ]
+}

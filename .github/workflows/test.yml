@@ -1,0 +1,141 @@
+name: Test Plugin
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  bats-tests:
+    name: BATS Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install BATS
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y bats
+
+      - name: Install jq for JSON validation
+        run: sudo apt-get install -y jq
+
+      - name: Run BATS tests
+        run: bats tests/test-plugin.bats
+
+  frontmatter-validation:
+    name: Validate SKILL.md and AGENT.md Frontmatter
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install PyYAML
+        run: pip install pyyaml
+
+      - name: Run frontmatter validation
+        run: |
+          chmod +x scripts/validate-frontmatter.sh
+          ./scripts/validate-frontmatter.sh
+
+  routing-evals:
+    name: TF-IDF Routing + Collision Evals
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Run routing evals
+        # --min-rank1 is the CI floor: at least this % of eval prompts must
+        # rank their expected skill #1. Raise it as the prompt set matures;
+        # never lower it to make a failing description "pass".
+        # Description collisions >=75% are reported as warnings here — add
+        # --fail-on-collision once the repo's descriptions are deduped.
+        run: node scripts/run-evals.js --min-rank1 75 --collision-threshold 0.75
+
+  codex-parity:
+    name: Codex Artifact Parity
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install PyYAML
+        run: pip install pyyaml
+
+      - name: Check Codex TOML / openai.yaml parity
+        run: |
+          chmod +x scripts/check-codex-parity.sh
+          ./scripts/check-codex-parity.sh
+
+  security-scan:
+    name: Security Scan
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Scan for secrets
+        run: |
+          # Check for potential hardcoded secrets in shipped content.
+          scan_dirs="skills"
+          [ -d agents ] && scan_dirs="$scan_dirs agents"
+          [ -d docs ] && scan_dirs="$scan_dirs docs"
+          if grep -ri "password\s*=\|api_key\s*=\|secret\s*=" $scan_dirs | grep -v "example\|placeholder\|TODO\|test-fixture"; then
+            echo "❌ Potential hardcoded secrets found"
+            exit 1
+          else
+            echo "✅ No hardcoded secrets detected"
+          fi
+
+      - name: Check for merge conflict markers
+        run: |
+          scan_dirs="skills"
+          [ -d agents ] && scan_dirs="$scan_dirs agents"
+          [ -d docs ] && scan_dirs="$scan_dirs docs"
+          if grep -r "^<<<<<<< \|^=======$\|^>>>>>>> " $scan_dirs 2>/dev/null; then
+            echo "❌ Found merge conflict markers"
+            exit 1
+          else
+            echo "✅ No merge conflict markers found"
+          fi
+
+  json-yaml-validation:
+    name: Validate JSON and YAML Files
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install validators
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y jq
+          sudo wget -qO /usr/local/bin/yq https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64
+          sudo chmod +x /usr/local/bin/yq
+
+      - name: Validate plugin manifests
+        run: |
+          jq empty .claude-plugin/plugin.json && echo "✅ .claude-plugin/plugin.json is valid"
+          jq empty .codex-plugin/plugin.json && echo "✅ .codex-plugin/plugin.json is valid"
+
+      - name: Validate GitHub Actions workflows
+        run: |
+          for workflow in .github/workflows/*.yml; do
+            echo "Validating $workflow..."
+            yq eval "$workflow" > /dev/null && echo "✅ $workflow is valid"
+          done

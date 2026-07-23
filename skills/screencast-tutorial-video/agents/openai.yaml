@@ -1,0 +1,7 @@
+# OpenAI Codex invocation policy for this skill.
+# allow_implicit_invocation: whether Codex may invoke the skill without the
+# user naming it explicitly. This is a side-effect skill (it runs preflight,
+# records the screen, and writes video files), so implicit invocation is off —
+# the user must ask for production explicitly.
+policy:
+  allow_implicit_invocation: false

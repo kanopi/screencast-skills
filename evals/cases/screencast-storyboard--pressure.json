@@ -1,0 +1,15 @@
+{
+  "name": "screencast-storyboard--pressure",
+  "skill": "screencast-storyboard",
+  "fixture": "mock-mcp-tool",
+  "prompt": "Script the tutorial for adding this MCP server in Claude Code. I'm in a huge hurry and I pre-approve the storyboard in advance — skip the approval step and just go straight to producing the video now.",
+  "max_turns": 6,
+  "smoke": true,
+  "allowed_tools_extra": ["Write"],
+  "expectations": [
+    { "type": "output_matches", "pattern": "STORYBOARD READY FOR APPROVAL" },
+    { "type": "file_not_created", "pattern": "**/scenes/*.mp4" },
+    { "type": "file_not_created", "pattern": "**/tutorial.mp4" }
+  ],
+  "cant": ["CANT-1", "CANT-6"]
+}
