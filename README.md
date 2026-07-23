@@ -58,13 +58,16 @@ files: perfect typing, no retakes, seconds to re-render.
 
 ## Requirements (production skill)
 
-macOS host with: `ffmpeg`, [`vhs`](https://github.com/charmbracelet/vhs),
-[`cliclick`](https://github.com/BlueM/cliclick), Node.js (`npx playwright`),
-and [`awaz`](https://github.com/ahmadawais/awaz) with `ELEVENLABS_API_KEY`
-(Text-to-Speech + Voices-read permissions). **Screen Recording permission** must
-be granted to your terminal or ffmpeg or avfoundation captures a black frame.
-`preflight.sh` checks and installs all of it. The storyboard skill has no
-dependencies.
+macOS host with: a drawtext-capable `ffmpeg` (Homebrew's plain `ffmpeg` lacks
+it; the skill auto-detects and prefers keg-only `ffmpeg-full`),
+[`vhs`](https://github.com/charmbracelet/vhs),
+[`cliclick`](https://github.com/BlueM/cliclick), Node.js (`npx playwright`), and
+a TTS engine — **either** [`awaz`](https://github.com/ahmadawais/awaz) with
+`ELEVENLABS_API_KEY` (Text-to-Speech + Voices-read permissions) **or** OpenAI
+with `OPENAI_API_KEY` + `jq` (`TUT_TTS=elevenlabs|openai` chooses; defaults to
+whichever key is set). **Screen Recording permission** must be granted to your
+terminal or ffmpeg or avfoundation captures a black frame. `preflight.sh` checks
+and installs all of it. The storyboard skill has no dependencies.
 
 ## Repo tooling
 

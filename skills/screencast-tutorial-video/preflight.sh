@@ -75,16 +75,33 @@ else
   need "node/npm missing (install Node.js from https://nodejs.org)"
 fi
 
-# 4. awaz (ElevenLabs TTS). NOT @elevenlabs/cli, which has no TTS.
-if ! command -v awaz >/dev/null; then
-  if command -v npm >/dev/null; then
+# 4. TTS engine: ElevenLabs (awaz) OR OpenAI. narrate.sh picks based on which
+#    key is set (or TUT_TTS). At least one must be usable.
+TTS_OK=0
+# ElevenLabs via awaz (NOT @elevenlabs/cli, which has no TTS).
+if [ -n "${ELEVENLABS_API_KEY:-}" ] || [ "${TUT_TTS:-}" = elevenlabs ]; then
+  if ! command -v awaz >/dev/null && command -v npm >/dev/null; then
     info "installing awaz (npm i -g awaz)"
     npm i -g awaz >/dev/null 2>&1 || true
   fi
+  if command -v awaz >/dev/null && [ -n "${ELEVENLABS_API_KEY:-}" ]; then
+    ok "TTS: ElevenLabs (awaz) ready"
+    TTS_OK=1
+  else
+    warn "ElevenLabs selected but not ready: need awaz (npm i -g awaz) and ELEVENLABS_API_KEY (Text-to-Speech + Voices-read perms)."
+  fi
 fi
-if command -v awaz >/dev/null; then ok "awaz present"; else need "awaz missing (npm i -g awaz)"; fi
-if [ -z "${ELEVENLABS_API_KEY:-}" ]; then
-  warn "ELEVENLABS_API_KEY is not set. Export it before recording. The key needs the Text to Speech and Voices (read) permissions, or awaz fails with missing_permissions."
+# OpenAI TTS (POST /v1/audio/speech).
+if [ -n "${OPENAI_API_KEY:-}" ] || [ "${TUT_TTS:-}" = openai ]; then
+  if [ -n "${OPENAI_API_KEY:-}" ] && command -v jq >/dev/null; then
+    ok "TTS: OpenAI ready (model ${TUT_OPENAI_TTS_MODEL:-gpt-4o-mini-tts})"
+    TTS_OK=1
+  else
+    warn "OpenAI selected but not ready: need OPENAI_API_KEY and jq (brew install jq)."
+  fi
+fi
+if [ "$TTS_OK" = 0 ]; then
+  need "no TTS engine ready. Set ELEVENLABS_API_KEY (with awaz) or OPENAI_API_KEY (with jq)."
 fi
 
 # 5. Fonts: Montserrat (caption bar) + Roboto Mono (command cards).

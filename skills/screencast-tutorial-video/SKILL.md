@@ -29,8 +29,11 @@ line, re-run one script, re-concat. No timeline editing.
 
 - An approved `storyboard.md` at `.tutorial-build/<slug>/storyboard.md`. If it is
   missing, direct the user to `screencast-storyboard` first — do not invent one.
-- macOS host with `ffmpeg`, `vhs`, `cliclick`, Node.js + Playwright, and `awaz`
-  with `ELEVENLABS_API_KEY` (Text-to-Speech + Voices-read permissions).
+- macOS host with `ffmpeg` (a drawtext-capable build — `ffmpeg-full`; preflight
+  handles this), `vhs`, `cliclick`, Node.js + Playwright, and a TTS engine:
+  **either** ElevenLabs (`awaz` + `ELEVENLABS_API_KEY`, Text-to-Speech +
+  Voices-read permissions) **or** OpenAI (`OPENAI_API_KEY` + `jq`). Pick with
+  `TUT_TTS=elevenlabs|openai`; default is whichever key is set.
 - **Screen Recording permission** granted to the terminal (System Settings →
   Privacy & Security → Screen Recording), or browser scenes capture black.
 
@@ -50,6 +53,7 @@ shared paths and settings.
 | `hands.sh move\|click\|type\|key\|hover ...` | The visible cursor + typing (cliclick) |
 | `record-browser.sh start\|stop <NN>` | avfoundation capture around a browser scene |
 | `make-card.sh <NN> <seconds> <command-text>` | Render a command card → `scenes/NN.mp4` |
+| `narrate.sh voices` / `narrate.sh <NN> "<text>"` | List voices / synthesize narration → `audio/NN.mp3` (ElevenLabs or OpenAI) |
 | `finish-scene.sh <NN>` | Pad video to narration, add lead/tail silence, mux audio, draw caption bar |
 | `concat.sh` | Concatenate `final/scene-*.mp4` → `final/tutorial.mp4` |
 
@@ -93,8 +97,9 @@ Create a todo per step.
    **do not proceed and do not claim any video was produced** — report the
    blocker.
 
-3. **Pick a voice.** Run `awaz voices`, present the names and ids, and ask which
-   to use. Remember the choice.
+3. **Pick a voice.** Run `./narrate.sh voices` (lists ElevenLabs voices via
+   `awaz`, or the OpenAI voice set, depending on the active engine), present the
+   options, and ask which to use. Remember the choice as `TUT_VOICE`.
 
 4. **Produce each scene** by `type`, in order. Write the one-line caption to
    `final/NN.caption.txt` first (empty file = no bar), then:
@@ -111,9 +116,13 @@ Create a todo per step.
 
 5. **Narrate.** For each scene:
    ```
-   awaz -v <voice> -o .tutorial-build/<slug>/audio/NN.mp3 "<narration text>"
+   export TUT_VOICE=<voice>          # from step 3
+   ./narrate.sh NN "<narration text>"
    ```
-   Optional: `--speed 0.5-2.0`, `--stability 0-1`, `--style 0-1`, `--model-id`.
+   `narrate.sh` writes `audio/NN.mp3` using the active engine (ElevenLabs via
+   `awaz`, or OpenAI `/v1/audio/speech`). ElevenLabs extra flags pass through
+   `TUT_TTS_FLAGS` (e.g. `--speed`, `--stability`); OpenAI model via
+   `TUT_OPENAI_TTS_MODEL`.
 
 6. **Finish each scene.** `./finish-scene.sh NN` for every scene. It pads the
    video to the narration (never trims audio to fit video), adds ~1s lead/tail
