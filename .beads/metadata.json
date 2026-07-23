@@ -1,0 +1,7 @@
+{
+  "database": "dolt",
+  "backend": "dolt",
+  "dolt_mode": "server",
+  "dolt_database": "screencast_skills",
+  "project_id": "bcd3034e-aad9-4b32-8591-a3627e487ef7"
+}
