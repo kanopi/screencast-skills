@@ -36,13 +36,13 @@ fi
 
 cd "$HDIR"
 if [ "$have_audio" = 1 ]; then
-  ffmpeg -y -i "scenes/${NN}.mp4" -i "audio/${NN}.mp3" \
+  "$FFMPEG" -y -i "scenes/${NN}.mp4" -i "audio/${NN}.mp3" \
     -filter_complex "[0:v]${vf}[v];[1:a]adelay=${LEAD_MS}|${LEAD_MS},apad[a]" \
     -map '[v]' -map '[a]' -t "${target}" \
     -codec:v libx264 -preset medium -pix_fmt yuv420p -codec:a aac -ar 44100 -movflags +faststart \
     "final/scene-${NN}.mp4" >"final/${NN}.finish.log" 2>&1
 else
-  ffmpeg -y -i "scenes/${NN}.mp4" -f lavfi -i anullsrc=r=44100:cl=stereo \
+  "$FFMPEG" -y -i "scenes/${NN}.mp4" -f lavfi -i anullsrc=r=44100:cl=stereo \
     -filter_complex "[0:v]${vf}[v]" \
     -map '[v]' -map 1:a -t "${target}" \
     -codec:v libx264 -preset medium -pix_fmt yuv420p -codec:a aac -ar 44100 -movflags +faststart \

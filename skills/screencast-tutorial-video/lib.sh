@@ -37,11 +37,45 @@ HDIR="${TUT_BUILD_DIR:-.tutorial-build}/${TUT_SLUG}"
 
 # Fonts, downloaded into the build dir by preflight so ffmpeg can read them.
 FONT_REGULAR="${TUT_FONT_REGULAR:-${HDIR}/assets/Montserrat-Regular.ttf}"
-FONT_MONO="${TUT_FONT_MONO:-${HDIR}/assets/DejaVuSansMono.ttf}"
+FONT_MONO="${TUT_FONT_MONO:-${HDIR}/assets/RobotoMono-Regular.ttf}"
+
+# Pick a drawtext-capable ffmpeg. Homebrew's plain `ffmpeg` is built WITHOUT
+# libfreetype (no drawtext), which every caption bar and command card needs; the
+# keg-only `ffmpeg-full` has it. Prefer, in order: $TUT_FFMPEG, ffmpeg-full's keg
+# path, then whatever `ffmpeg` is on PATH. preflight.sh verifies drawtext on the
+# result and points at `brew install ffmpeg-full` if none qualifies.
+_pick_ffmpeg() {
+  local c
+  for c in "${TUT_FFMPEG:-}" \
+           /opt/homebrew/opt/ffmpeg-full/bin/ffmpeg \
+           /usr/local/opt/ffmpeg-full/bin/ffmpeg \
+           "$(command -v ffmpeg 2>/dev/null || true)"; do
+    [ -n "$c" ] || continue
+    command -v "$c" >/dev/null 2>&1 || [ -x "$c" ] || continue
+    # No `grep -q`: it exits early, SIGPIPEs ffmpeg, and under `set -o pipefail`
+    # that marks the pipeline failed — wrongly rejecting a good binary. Plain
+    # grep reads all input, so the pipeline status is grep's alone.
+    if "$c" -hide_banner -filters 2>/dev/null | grep -w drawtext >/dev/null 2>&1; then
+      echo "$c"; return 0
+    fi
+  done
+  # Fall back to plain ffmpeg (no drawtext) so scenes without text still render;
+  # preflight flags the missing filter.
+  command -v ffmpeg >/dev/null 2>&1 && { command -v ffmpeg; return 0; }
+  echo ffmpeg
+}
+FFMPEG="$(_pick_ffmpeg)"
+# ffprobe next to the chosen ffmpeg if present, else PATH ffprobe.
+_FFDIR="$(dirname "$FFMPEG")"
+if [ -x "$_FFDIR/ffprobe" ]; then
+  FFPROBE="${TUT_FFPROBE:-$_FFDIR/ffprobe}"
+else
+  FFPROBE="${TUT_FFPROBE:-$(command -v ffprobe 2>/dev/null || echo ffprobe)}"
+fi
 
 # ffprobe a media file (host path) for its duration in seconds.
 cduration() {
-  ffprobe -v error -show_entries format=duration -of csv=p=0 "$1"
+  "$FFPROBE" -v error -show_entries format=duration -of csv=p=0 "$1"
 }
 
 die() { echo "error: $*" >&2; exit 1; }

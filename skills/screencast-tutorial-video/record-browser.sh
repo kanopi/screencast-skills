@@ -22,7 +22,7 @@ case "$cmd" in
   start)
     # Capture the whole display (avfoundation cannot pre-crop), include the cursor,
     # then crop to the browser window region. Match/stop by output path on SIGINT.
-    ffmpeg -y -f avfoundation -capture_cursor 1 -framerate "$FPS" -i "${AVF_SCREEN}:" \
+    "$FFMPEG" -y -f avfoundation -capture_cursor 1 -framerate "$FPS" -i "${AVF_SCREEN}:" \
       -vf "crop=${WIN_W}:${WIN_H}:${WIN_X}:${WIN_Y}" \
       -codec:v libx264 -preset ultrafast -pix_fmt yuv420p "$OUT" >"$LOG" 2>&1 &
     sleep 0.8

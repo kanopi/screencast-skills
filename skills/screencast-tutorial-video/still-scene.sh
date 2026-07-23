@@ -40,7 +40,8 @@ fi
 
 vf="${pre},zoompan=z='min(zoom+${ZSTEP},${ZOOM_MAX})':x=${zx}:y=${zy}:d=${FRAMES}:s=${RES}:fps=${FPS}"
 
-ffmpeg -y -loop 1 -i "$PNG" -vf "$vf" -t "$DUR" -r "$FPS" \
-  -codec:v libx264 -preset medium -pix_fmt yuv420p "$OUT" >/dev/null 2>&1
+"$FFMPEG" -y -loop 1 -i "$PNG" -vf "$vf" -t "$DUR" -r "$FPS" \
+  -codec:v libx264 -preset medium -pix_fmt yuv420p "$OUT" >"$HDIR/scenes/${NN}.still.log" 2>&1
 
+[ -f "$OUT" ] || die "ffmpeg did not produce $OUT (see $HDIR/scenes/${NN}.still.log)"
 echo "desktop-still scene $NN -> $OUT (${DUR}s)"

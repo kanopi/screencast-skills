@@ -18,7 +18,7 @@ for f in $(printf '%s\n' "${scenes[@]}" | sort); do
 done
 
 cd "$HDIR/final"
-ffmpeg -y -f concat -safe 0 -i concat.txt \
+"$FFMPEG" -y -f concat -safe 0 -i concat.txt \
   -codec:v libx264 -preset medium -pix_fmt yuv420p -codec:a aac -ar 44100 -movflags +faststart \
   tutorial.mp4 >concat.log 2>&1
 

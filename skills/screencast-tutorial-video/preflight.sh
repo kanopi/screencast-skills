@@ -37,6 +37,25 @@ brew_dep ffprobe ffmpeg
 brew_dep vhs vhs
 brew_dep cliclick cliclick
 
+# ffmpeg must have the drawtext filter (libfreetype) — every caption bar and
+# command card depends on it. Homebrew's plain `ffmpeg` is built WITHOUT it; the
+# keg-only `ffmpeg-full` has it. lib.sh resolves $FFMPEG to a drawtext-capable
+# binary if one exists; here we verify and, if not, install ffmpeg-full.
+if "$FFMPEG" -hide_banner -filters 2>/dev/null | grep -w drawtext >/dev/null 2>&1; then
+  ok "ffmpeg has the drawtext filter ($FFMPEG)"
+else
+  if command -v brew >/dev/null; then
+    info "installing ffmpeg-full for the drawtext filter (brew install ffmpeg-full)"
+    brew install ffmpeg-full >/dev/null 2>&1 || true
+    FFMPEG="$(_pick_ffmpeg)"
+  fi
+  if "$FFMPEG" -hide_banner -filters 2>/dev/null | grep -w drawtext >/dev/null 2>&1; then
+    ok "ffmpeg has the drawtext filter ($FFMPEG)"
+  else
+    need "no ffmpeg with the drawtext filter (libfreetype). Install a full build: brew install ffmpeg-full"
+  fi
+fi
+
 # 3. Node + Playwright (browser scenes).
 if command -v node >/dev/null && command -v npm >/dev/null; then
   ok "node present ($(node -v))"
@@ -68,7 +87,7 @@ if [ -z "${ELEVENLABS_API_KEY:-}" ]; then
   warn "ELEVENLABS_API_KEY is not set. Export it before recording. The key needs the Text to Speech and Voices (read) permissions, or awaz fails with missing_permissions."
 fi
 
-# 5. Fonts: Montserrat (caption bar) + DejaVu Sans Mono (command cards).
+# 5. Fonts: Montserrat (caption bar) + Roboto Mono (command cards).
 if [ ! -f "$FONT_REGULAR" ]; then
   info "downloading Montserrat (Google Fonts)"
   curl -fsSL -o "$FONT_REGULAR" \
@@ -77,16 +96,16 @@ if [ ! -f "$FONT_REGULAR" ]; then
 fi
 [ -f "$FONT_REGULAR" ] && ok "Montserrat font in assets" || need "Montserrat font missing"
 if [ ! -f "$FONT_MONO" ]; then
-  info "downloading DejaVu Sans Mono"
+  info "downloading Roboto Mono (Google Fonts)"
   curl -fsSL -o "$FONT_MONO" \
-    "https://github.com/dejavu-fonts/dejavu-fonts/raw/master/ttf/DejaVuSansMono.ttf" \
-    || warn "could not download DejaVuSansMono; command cards will fail until $FONT_MONO exists"
+    "https://github.com/google/fonts/raw/main/ofl/robotomono/RobotoMono%5Bwght%5D.ttf" \
+    || warn "could not download Roboto Mono; command cards will fail until $FONT_MONO exists"
 fi
 [ -f "$FONT_MONO" ] && ok "mono font in assets" || need "mono font missing"
 
 # 6. macOS Screen Recording permission (avfoundation captures black without it).
 echo "-- avfoundation capture devices (pick the main display index for TUT_AVF_SCREEN) --"
-ffmpeg -hide_banner -f avfoundation -list_devices true -i "" 2>&1 | sed 's/^/     /' | grep -i -A20 "screen\|video devices" || true
+"$FFMPEG" -hide_banner -f avfoundation -list_devices true -i "" 2>&1 | sed 's/^/     /' | grep -i -A20 "screen\|video devices" || true
 warn "Grant Screen Recording to your terminal (or ffmpeg) in System Settings > Privacy & Security > Screen Recording, then restart the terminal. Without it, browser scenes record a black frame. Current TUT_AVF_SCREEN=$AVF_SCREEN."
 
 echo "== preflight complete =="
