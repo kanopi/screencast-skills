@@ -54,7 +54,10 @@ Run every script with `export TUT_SLUG=<slug>` set, **from the directory that
 holds `.tutorial-build/`** (the build dir is resolved relative to the working
 directory). To run from elsewhere, `export HDIR=<absolute build dir>` — the
 scripts and `browser-scene.mjs` both honor it, so scenes never land in the wrong
-folder. Scripts read `lib.sh` for shared paths and settings.
+folder. Scripts read `lib.sh` for shared paths and settings. For house defaults
+(voice, tone, resolution) `export TUT_PRESET=<brand>` (e.g. `kanopi`) to load
+`presets/<brand>.env`; the Kanopi kit's non-env conventions (pronunciation
+lexicon, intro/outro, fonts) are in `presets/kanopi-brand.md`.
 
 | Script | Purpose |
 |---|---|

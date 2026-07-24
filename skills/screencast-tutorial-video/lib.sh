@@ -9,6 +9,19 @@
 # /var/www/html paths, Xvfb :99) is gone. Everything runs natively on the host.
 set -euo pipefail
 
+# Optional brand/project preset. `export TUT_PRESET=kanopi` sources
+# presets/kanopi.env (next to this lib) to set house voice, tone, and format
+# defaults. Presets use ${VAR:-default}, so an explicit env var still wins.
+if [ -n "${TUT_PRESET:-}" ]; then
+  _LIBDIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+  if [ -f "$_LIBDIR/presets/${TUT_PRESET}.env" ]; then
+    # shellcheck disable=SC1090
+    source "$_LIBDIR/presets/${TUT_PRESET}.env"
+  else
+    echo "warn: preset not found: $_LIBDIR/presets/${TUT_PRESET}.env" >&2
+  fi
+fi
+
 : "${TUT_SLUG:?set TUT_SLUG to the tutorial slug, e.g. export TUT_SLUG=mcp-github-claude-code}"
 
 # Capture settings (override with TUT_* env vars if needed).

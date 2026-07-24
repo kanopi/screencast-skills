@@ -9,6 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **Brand presets** — `export TUT_PRESET=<name>` sources `presets/<name>.env` for
+  house voice/tone/format defaults (values use `${VAR:-default}` so explicit env
+  still wins). Ships `presets/kanopi.env` (OpenAI TTS, voice `marin`, tone,
+  1920x1080/25fps) and `presets/kanopi-brand.md` (pronunciation lexicon —
+  Kanopi → "CAN-uh-pee" — intro/outro pattern, fonts/colors, caption/engine
+  conventions).
 - **Method A browser engine** (`browser-scene.sh` + `browser-scene.mjs`) — the
   recommended way to record docs/UI tours. Playwright renders the page headless
   at 1920x1080 and records **only the page**: no OS screen capture, no
