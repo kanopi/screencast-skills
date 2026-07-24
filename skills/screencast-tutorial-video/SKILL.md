@@ -18,8 +18,17 @@ engine per surface:
 |---|---|---|
 | Terminal (Claude Code / any CLI) | VHS `.tape` → MP4 | `render-tape.sh` |
 | Native app (Claude Desktop) | ffmpeg `zoompan` + `drawbox` over a PNG still | `still-scene.sh` |
-| Browser (claude.ai / dashboards) | Playwright (locate) + cliclick (visible cursor) + ffmpeg avfoundation (capture) | `browser.sh` + `hands.sh` + `record-browser.sh` |
+| Browser — **docs / UI tours (recommended)** | Playwright records the page headless at 1080p (no OS capture, no permissions, records only the page) | `browser-scene.sh` |
+| Browser — **real cursor on camera** | Playwright (locate) + cliclick (visible cursor) + ffmpeg avfoundation (capture) | `browser.sh` + `hands.sh` + `record-browser.sh` (or automated: `browser-scene-screencap.sh`) |
 | Abstract command | command card (still) | `make-card.sh` |
+
+**Two browser engines.** Method A (`browser-scene.sh`) renders the page
+off-screen and records only the page — crisp, deterministic, no Screen-Recording
+permission, no cursor calibration, and nothing else on your desktop can leak into
+frame. Use it for almost everything. Method B (the cliclick/avfoundation split)
+is only for when you must show the real macOS cursor performing clicks; it
+captures the live screen, so it needs the permission and a clean desktop (see the
+privacy caution in `references/browser-playwright.md`).
 
 Each scene is padded to its narration, gets a caption bar, and concatenates into
 `final/tutorial.mp4`. Every scene is independently re-renderable — change one
@@ -41,17 +50,22 @@ line, re-run one script, re-concat. No timeline editing.
 
 ## Helper scripts
 
-Run every script with `export TUT_SLUG=<slug>` set. Scripts read `lib.sh` for
-shared paths and settings.
+Run every script with `export TUT_SLUG=<slug>` set, **from the directory that
+holds `.tutorial-build/`** (the build dir is resolved relative to the working
+directory). To run from elsewhere, `export HDIR=<absolute build dir>` — the
+scripts and `browser-scene.mjs` both honor it, so scenes never land in the wrong
+folder. Scripts read `lib.sh` for shared paths and settings.
 
 | Script | Purpose |
 |---|---|
 | `preflight.sh` | Check + install host deps; check Screen Recording; create the build dir |
 | `render-tape.sh <NN> <tape>` | Render a VHS terminal scene → `scenes/NN.mp4` |
 | `still-scene.sh <NN> <png> [dur] [x:y:w:h]` | Ken Burns + highlight over a still → `scenes/NN.mp4` |
-| `browser.sh start\|open\|box\|wait\|fill\|snapshot\|stop` | The browser brain (locate elements) |
-| `hands.sh move\|click\|type\|key\|hover ...` | The visible cursor + typing (cliclick) |
-| `record-browser.sh start\|stop <NN>` | avfoundation capture around a browser scene |
+| `browser-scene.sh <NN> <spec.json>\|<url> [s]` | **Method A (recommended):** Playwright records the page headless → `scenes/NN.mp4` |
+| `browser.sh start\|open\|box\|wait\|fill\|snapshot\|stop` | Method B brain (locate elements) |
+| `hands.sh move\|click\|type\|key\|hover ...` | Method B hands: visible cursor + typing (cliclick) |
+| `record-browser.sh start\|stop <NN>` | Method B capture: avfoundation around a browser scene |
+| `browser-scene-screencap.sh <NN> <url> [s]` | Method B automated: fullscreen capture in one call (screen-leak caution) |
 | `make-card.sh <NN> <seconds> <command-text>` | Render a command card → `scenes/NN.mp4` |
 | `narrate.sh voices` / `narrate.sh <NN> "<text>"` | List voices / synthesize narration → `audio/NN.mp3` (ElevenLabs or OpenAI) |
 | `finish-scene.sh <NN>` | Pad video to narration, add lead/tail silence, mux audio, draw caption bar |
@@ -65,11 +79,12 @@ Loaded-on-demand detail lives in `references/`: `terminal-vhs.md`,
 ```
 <cwd>/.tutorial-build/<slug>/
   storyboard.md            # from screencast-storyboard (input)
-  assets/                  # Montserrat + DejaVuSansMono (preflight downloads)
+  assets/                  # Montserrat + Roboto Mono (preflight downloads)
+  specs/NN.json            # browser-scene.sh scene spec (Method A)
   tapes/NN.tape            # normalized VHS tape (render-tape.sh writes this)
   stills/NN.png            # native-app screenshots you capture
   scenes/NN.mp4            # raw silent scene (any engine) or command card
-  audio/NN.mp3             # narration from awaz
+  audio/NN.mp3             # narration (awaz/ElevenLabs or OpenAI)
   final/NN.caption.txt     # one-line caption for scene NN (empty = no bar)
   final/scene-NN.mp4       # padded + muxed + captioned
   final/tutorial.mp4       # concatenated result
@@ -107,10 +122,14 @@ Create a todo per step.
      `./render-tape.sh NN <tape>`.
    - `desktop-still`: capture `stills/NN.png`, then
      `./still-scene.sh NN stills/NN.png <dur> [highlight]`.
-   - `browser-action`: `./browser.sh start "<url>"` (once), `./record-browser.sh
-     start NN`, drive with `browser.sh box` + `hands.sh move/click/type`, then
-     `./record-browser.sh stop NN`. Calibrate the box→cliclick offset on the
-     first scene (`references/browser-playwright.md`).
+   - `browser-action` — **Method A (default):** write a scene spec (URL + `steps`:
+     scroll / highlight / wait) and `./browser-scene.sh NN <spec.json>`. It waits
+     for fonts (no FOUT) and records only the page. See
+     `references/browser-playwright.md` for the spec format. **Method B** (real
+     on-camera cursor) only when needed: `./browser.sh start "<url>"`,
+     `./record-browser.sh start NN`, drive with `browser.sh box` +
+     `hands.sh move/click/type`, `./record-browser.sh stop NN`, and calibrate the
+     box→cliclick offset once.
    - `command-card`: `./make-card.sh NN <seconds> "<command>"`.
    - `intro`/`outro`: usually a `desktop-still` or `command-card`.
 
@@ -123,6 +142,10 @@ Create a todo per step.
    `awaz`, or OpenAI `/v1/audio/speech`). ElevenLabs extra flags pass through
    `TUT_TTS_FLAGS` (e.g. `--speed`, `--stability`); OpenAI model via
    `TUT_OPENAI_TTS_MODEL`.
+   **Pronunciation:** the OpenAI `instructions` field (`TUT_TTS_INSTRUCTIONS`) is
+   unreliable for names — if a brand/term is mispronounced, respell it
+   phonetically in the narration text itself (e.g. write "CAN-uh-pee" for
+   "Kanopi"). Adjust the syllable emphasis until it lands.
 
 6. **Finish each scene.** `./finish-scene.sh NN` for every scene. It pads the
    video to the narration (never trims audio to fit video), adds ~1s lead/tail
@@ -148,8 +171,11 @@ Create a todo per step.
 
 | Mistake | Fix |
 |---|---|
-| Using `@elevenlabs/cli` for narration | It has no TTS. Use `awaz` (`npm i -g awaz`). |
-| Playwright doing the click | Its input is invisible on camera. Click with `hands.sh` (cliclick); use `browser.sh` only to locate. |
+| Using `@elevenlabs/cli` for narration | It has no TTS. Use `awaz` (`npm i -g awaz`) or OpenAI via `narrate.sh`. |
+| Reaching for Method B (screen capture) by default | Use Method A (`browser-scene.sh`) for tours — it records only the page. Method B films the whole screen and can leak other windows/notifications. |
+| A flash of unstyled text at a scene start | Method A waits for `document.fonts.ready` and trims the first ~1.5s; keep that lead-trim when assembling. |
+| Scenes landing in the wrong folder | Run from the build parent, or `export HDIR=<absolute>` so `.sh` and `.mjs` agree. |
+| Playwright doing the click (Method B) | Its input is invisible on camera. Click with `hands.sh` (cliclick); use `browser.sh` only to locate. |
 | Recording a live terminal | Terminal scenes are VHS `.tape` files, not screen captures. |
 | Browser scene records black | Grant Screen Recording permission and restart the terminal (`capture-macos.md`). |
 | Cursor clicks miss the element | Calibrate the box→cliclick offset once (`browser-playwright.md`). |

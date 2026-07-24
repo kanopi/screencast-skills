@@ -8,9 +8,13 @@
 // visible move + click. This mirrors the sibling skill's agent-browser/xdotool
 // split, ported to the macOS host.
 
-import { chromium } from 'playwright';
 import { spawn } from 'node:child_process';
 import { mkdirSync, existsSync } from 'node:fs';
+import { createRequire } from 'node:module';
+// ESM import does not honor NODE_PATH; resolve the globally-installed playwright
+// via require (which does). preflight installs it with npm i -g.
+const require = createRequire(import.meta.url);
+const { chromium } = require('playwright');
 
 const CDP_PORT = process.env.TUT_CDP_PORT || '9222';
 const CDP_URL = `http://127.0.0.1:${CDP_PORT}`;

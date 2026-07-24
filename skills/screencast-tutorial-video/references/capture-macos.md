@@ -1,18 +1,17 @@
 # macOS screen capture with ffmpeg avfoundation
 
-Browser scenes are captured with ffmpeg's `avfoundation` input. Two things must
-be right or the capture is black or misframed: the **device index** and the
-**Screen Recording permission**.
+This applies to **Method B** browser capture only (Method A, `browser-scene.sh`,
+records the page headless and needs none of this). Two things must be right or
+the capture is black or misframed: the **device index** and the **Screen
+Recording permission**.
 
-## Device index
+## Device index (it moves — do not hardcode)
 
 List capture devices:
 
 ```bash
 ffmpeg -f avfoundation -list_devices true -i ""
 ```
-
-Output looks like:
 
 ```
 [AVFoundation indev] AVFoundation video devices:
@@ -21,10 +20,15 @@ Output looks like:
 [AVFoundation indev] [2] Capture screen 1
 ```
 
-Pick the `Capture screen N` index for the display the browser is on and set it:
+**These indices shift** whenever a camera connects or disconnects — an iPhone
+Continuity Camera appearing can bump every screen index by one, so a value that
+worked yesterday returns "Invalid device index" today. Because of this,
+`browser-scene-screencap.mjs` re-detects the "Capture screen 0" index at runtime
+rather than trusting a fixed number; `TUT_AVF_SCREEN` is only an override/fallback
+(and `lib.sh`'s default of `1` is frequently wrong). To pin it manually:
 
 ```bash
-export TUT_AVF_SCREEN=1
+export TUT_AVF_SCREEN=<the current "Capture screen 0" index>
 ```
 
 `record-browser.sh` captures the whole display and crops to the browser window

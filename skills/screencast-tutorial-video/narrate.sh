@@ -21,7 +21,7 @@ if [ -z "$TTS" ]; then
   fi
 fi
 
-OPENAI_VOICES="alloy ash ballad coral echo fable nova onyx sage shimmer verse"
+OPENAI_VOICES="alloy ash ballad cedar coral echo fable marin nova onyx sage shimmer verse"
 OPENAI_MODEL="${TUT_OPENAI_TTS_MODEL:-gpt-4o-mini-tts}"
 
 list_voices() {
@@ -62,8 +62,10 @@ synth() {
       [ -n "${OPENAI_API_KEY:-}" ] || die "OPENAI_API_KEY is not set"
       command -v jq >/dev/null || die "jq required to build the OpenAI request (brew install jq)"
       local voice="${TUT_VOICE:-alloy}" payload code
+      # Optional TUT_TTS_INSTRUCTIONS steers tone and pronunciation (gpt-4o-mini-tts).
       payload="$(jq -n --arg m "$OPENAI_MODEL" --arg v "$voice" --arg i "$text" \
-        '{model:$m, voice:$v, input:$i, response_format:"mp3"}')"
+        --arg ins "${TUT_TTS_INSTRUCTIONS:-}" \
+        '{model:$m, voice:$v, input:$i, response_format:"mp3"} + (if $ins=="" then {} else {instructions:$ins} end)')"
       code="$(curl -sS -w '%{http_code}' -o "$out" \
         -X POST https://api.openai.com/v1/audio/speech \
         -H "Authorization: Bearer ${OPENAI_API_KEY}" \

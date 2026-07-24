@@ -42,7 +42,7 @@ if [ "$have_audio" = 1 ]; then
     -codec:v libx264 -preset medium -pix_fmt yuv420p -codec:a aac -ar 44100 -movflags +faststart \
     "final/scene-${NN}.mp4" >"final/${NN}.finish.log" 2>&1
 else
-  "$FFMPEG" -y -i "scenes/${NN}.mp4" -f lavfi -i anullsrc=r=44100:cl=stereo \
+  "$FFMPEG" -y -i "scenes/${NN}.mp4" -f lavfi -i anullsrc=r=44100:cl=mono \
     -filter_complex "[0:v]${vf}[v]" \
     -map '[v]' -map 1:a -t "${target}" \
     -codec:v libx264 -preset medium -pix_fmt yuv420p -codec:a aac -ar 44100 -movflags +faststart \

@@ -2,6 +2,8 @@
 # Shared config for the screencast-tutorial-video helper scripts (macOS host).
 # Source this from every script. Run scripts from the directory where you want
 # the .tutorial-build/ tree to live (usually your project root), with TUT_SLUG set.
+# To run from anywhere, export an absolute HDIR (or TUT_BUILD_DIR) so the .sh
+# scripts and browser-scene.mjs agree on the build dir regardless of cwd.
 #
 # Ported from drupal-tutorial-video: the ddev container plumbing (cexec,
 # /var/www/html paths, Xvfb :99) is gone. Everything runs natively on the host.
@@ -13,10 +15,11 @@ set -euo pipefail
 RES="${TUT_RES:-1920x1080}"
 FPS="${TUT_FPS:-25}"
 
-# macOS avfoundation screen-capture device index (find it with:
-#   ffmpeg -f avfoundation -list_devices true -i "").
-# The main display is usually the first "Capture screen" entry. record-browser.sh
-# uses this; verify it on the first run (see references/capture-macos.md).
+# macOS avfoundation screen-capture device index. These indices SHIFT when
+# cameras connect/disconnect (Continuity Camera), so browser-scene-screencap.mjs
+# auto-detects the "Capture screen 0" index at runtime; this default is only a
+# fallback. Find it with: ffmpeg -f avfoundation -list_devices true -i "".
+# See references/capture-macos.md.
 AVF_SCREEN="${TUT_AVF_SCREEN:-1}"
 
 # Browser window geometry for the browser-action scenes. The window is launched
@@ -32,8 +35,10 @@ WIN_H="${TUT_WIN_H:-1080}"
 OFF_X="${TUT_OFF_X:-0}"
 OFF_Y="${TUT_OFF_Y:-0}"
 
-# Build directory: single host path (no container mount anymore).
-HDIR="${TUT_BUILD_DIR:-.tutorial-build}/${TUT_SLUG}"
+# Build directory: single host path (no container mount anymore). An exported
+# HDIR wins, so wrappers can pass an absolute path to both the .sh scripts and
+# browser-scene.mjs (they must agree, or scenes land in the wrong dir).
+HDIR="${HDIR:-${TUT_BUILD_DIR:-.tutorial-build}/${TUT_SLUG}}"
 
 # Fonts, downloaded into the build dir by preflight so ffmpeg can read them.
 FONT_REGULAR="${TUT_FONT_REGULAR:-${HDIR}/assets/Montserrat-Regular.ttf}"
