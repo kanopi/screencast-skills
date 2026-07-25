@@ -1,6 +1,6 @@
 {
   "name": "screencast-skills",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Author and produce narrated screencast tutorials for AI tooling and any developer workflow. screencast-storyboard scripts a tutorial: it reads the real docs and drafts an approved storyboard (transcript + timeline). screencast-tutorial-video produces the video: it records each scene with the right engine (VHS terminal, ffmpeg still-motion for native apps, Playwright + cliclick for the browser, command cards) and assembles a voice-over, captioned 1920x1080 MP4. Trigger phrases: \"script a tutorial\", \"draft the transcript and timeline\", \"outline a screencast\", \"record the screencast\", \"produce the narrated MP4\", \"render the tutorial video\". macOS host, ElevenLabs voice-over via awaz.",
   "author": {
     "name": "Kanopi Studios",
