@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Method A browser engine (recommended): Playwright records the page directly to
-# scenes/NN.mp4 at 1920x1080 — headless, off-screen, no OS screen capture, no
+# scenes/NN.mp4 at 1920x1080, headless, off-screen, no OS screen capture, no
 # Screen-Recording permission, no cursor calibration, and it records ONLY the
 # page (never the desktop). Best for docs/UI tours. Run with TUT_SLUG set.
 #   ./browser-scene.sh <NN> <spec.json>       # spec-driven (preferred)

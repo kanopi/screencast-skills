@@ -10,7 +10,7 @@ macOS cursor performing clicks on camera.
 
 `browser-scene.sh` drives Playwright and records the page **headless, off-screen,
 at exactly 1920x1080**. No OS screen capture, no Screen-Recording permission, no
-cursor calibration, no Retina scaling — and it records **only the page**, so
+cursor calibration, no Retina scaling, and it records **only the page**, so
 nothing else on your desktop can leak into frame. Text is crisp
 (`deviceScaleFactor: 2`, supersampled to 1080p).
 
@@ -48,7 +48,7 @@ Step kinds:
 
 Web fonts load a beat after first paint, so the very start of a recording can
 flash unstyled. Method A waits for `document.fonts.ready` before running steps,
-and the assembly trims the first ~1.5–2s of each clip as a backstop. When you
+and the assembly trims the first ~1.5, 2s of each clip as a backstop. When you
 size a scene, record long and trim: `ffmpeg -i raw.mp4 -ss 2.0 -t <need>` drops
 the load-in and cuts to length. So a spec's total step time should be
 `need + ~3s` of headroom.
@@ -56,7 +56,7 @@ the load-in and cuts to length. So a spec's total step time should be
 ### Highlights
 
 Method A highlights an element by outlining it in-page (cleaner and more precise
-than a cursor). There is no visible cursor in Method A — for a tour that is a
+than a cursor). There is no visible cursor in Method A, for a tour that is a
 feature, not a gap.
 
 ---
@@ -65,12 +65,12 @@ feature, not a gap.
 
 Use only when the video must show the real macOS cursor clicking. Three tools:
 
-- **`browser.sh` (brain)** — headed Chromium at a fixed position/size; navigates,
+- **`browser.sh` (brain)**, headed Chromium at a fixed position/size; navigates,
   reads the a11y tree, returns an element's on-screen box. Its input is synthetic
   and invisible, so it never does the visible clicking.
-- **`hands.sh` (hands)** — `cliclick` moves the *real* cursor to that box, clicks,
+- **`hands.sh` (hands)**, `cliclick` moves the *real* cursor to that box, clicks,
   types. Because the cursor is real, ffmpeg avfoundation captures it.
-- **`record-browser.sh` (capture)** — ffmpeg avfoundation grabs the display
+- **`record-browser.sh` (capture)**, ffmpeg avfoundation grabs the display
   (cursor included), cropped to the window region. (`browser-scene-screencap.sh`
   automates launch + scroll + capture in one call.)
 
@@ -84,8 +84,8 @@ read CX CY < <(./browser.sh box "text=New chat")   # viewport coords
 ./record-browser.sh stop 03
 ```
 
-> **Privacy caution.** Method B captures the live screen, so anything visible —
-> other windows, Finder, notifications, a PiP thumbnail — is recorded. Also note
+> **Privacy caution.** Method B captures the live screen, so anything visible, 
+> other windows, Finder, notifications, a PiP thumbnail, is recorded. Also note
 > Playwright does **not** honor `--kiosk`/`--start-fullscreen` reliably (it opens
 > a default-size automation window), so the capture can include the desktop
 > behind it. Use a clean, quiet screen, or prefer Method A.
@@ -101,8 +101,8 @@ screen_y = viewport_y + OFF_Y   (OFF_Y = window origin y + top chrome/toolbar)
 ```
 
 `./browser.sh box "<element>"` → `./hands.sh move CX CY` → screenshot, measure the
-gap, `export TUT_OFF_X=<dx> TUT_OFF_Y=<dy>` (top chrome ~70–90px). On a 2× Retina
-display the capture is in backing pixels — see `capture-macos.md` for scaling.
+gap, `export TUT_OFF_X=<dx> TUT_OFF_Y=<dy>` (top chrome ~70, 90px). On a 2× Retina
+display the capture is in backing pixels, see `capture-macos.md` for scaling.
 
 ---
 

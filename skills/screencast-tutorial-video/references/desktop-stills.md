@@ -8,7 +8,7 @@ gentle Ken Burns zoom and an optional highlight box.
 ## Capture the still
 
 - **Full window:** `Cmd-Shift-4` then Space, click the window (or use
-  `screencapture -w -o stills/NN.png` — `-o` omits the drop shadow).
+  `screencapture -w -o stills/NN.png`, `-o` omits the drop shadow).
 - **Region:** `Cmd-Shift-4` and drag, or `screencapture -R x,y,w,h stills/NN.png`.
 - Capture at the largest size you can; `still-scene.sh` scales and pads to
   1920x1080, so a Retina-resolution PNG gives the zoom room to work without

@@ -73,7 +73,7 @@ _pick_ffmpeg() {
     [ -n "$c" ] || continue
     command -v "$c" >/dev/null 2>&1 || [ -x "$c" ] || continue
     # No `grep -q`: it exits early, SIGPIPEs ffmpeg, and under `set -o pipefail`
-    # that marks the pipeline failed — wrongly rejecting a good binary. Plain
+    # that marks the pipeline failed, wrongly rejecting a good binary. Plain
     # grep reads all input, so the pipeline status is grep's alone.
     if "$c" -hide_banner -filters 2>/dev/null | grep -w drawtext >/dev/null 2>&1; then
       echo "$c"; return 0

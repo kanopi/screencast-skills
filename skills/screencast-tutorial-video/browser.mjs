@@ -3,7 +3,7 @@
 // A single persistent Chromium is launched at a known screen position/size with
 // remote debugging on a fixed port. Each subcommand connects over CDP, acts, and
 // disconnects, so the window survives between browser.sh calls (open -> box ->
-// wait -> ...). Playwright input is NOT used to click on camera — `box` returns
+// wait -> ...). Playwright input is NOT used to click on camera, `box` returns
 // the element's viewport-center coordinates, and hands.sh (cliclick) does the
 // visible move + click. This mirrors the sibling skill's agent-browser/xdotool
 // split, ported to the macOS host.

@@ -5,7 +5,7 @@ records the page headless and needs none of this). Two things must be right or
 the capture is black or misframed: the **device index** and the **Screen
 Recording permission**.
 
-## Device index (it moves — do not hardcode)
+## Device index (it moves, do not hardcode)
 
 List capture devices:
 
@@ -20,7 +20,7 @@ ffmpeg -f avfoundation -list_devices true -i ""
 [AVFoundation indev] [2] Capture screen 1
 ```
 
-**These indices shift** whenever a camera connects or disconnects — an iPhone
+**These indices shift** whenever a camera connects or disconnects, an iPhone
 Continuity Camera appearing can bump every screen index by one, so a value that
 worked yesterday returns "Invalid device index" today. Because of this,
 `browser-scene-screencap.mjs` re-detects the "Capture screen 0" index at runtime
@@ -65,7 +65,7 @@ On a Retina display, avfoundation may report the capture in backing-store pixels
 
 ## Cursor
 
-`-capture_cursor 1` includes the real macOS cursor in the capture — that is the
+`-capture_cursor 1` includes the real macOS cursor in the capture, that is the
 cursor `hands.sh`/cliclick moves. This is why the browser split works: what the
 viewer sees moving is exactly what clicks.
 

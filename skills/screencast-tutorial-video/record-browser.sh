@@ -7,7 +7,7 @@
 #
 # Uses ffmpeg avfoundation to grab the main display with the real cursor, cropped
 # to the browser window region (WIN_* in lib.sh). Screen Recording permission must
-# be granted or the capture is a black frame — preflight.sh checks this.
+# be granted or the capture is a black frame, preflight.sh checks this.
 # Ported from drupal-tutorial-video's x11grab record-scene.sh.
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$HERE/lib.sh"

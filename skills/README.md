@@ -1,7 +1,7 @@
 # Skills
 
 Overview of the Agent Skills in this plugin. Keep this list in parity with
-the `skills/` directory — `tests/test-plugin.bats` asserts that the number
+the `skills/` directory, `tests/test-plugin.bats` asserts that the number
 of `### N.` entries below equals the number of skill directories. Append
 the next number rather than inserting mid-list.
 
@@ -18,9 +18,9 @@ tool. Triggers: "script a tutorial", "draft the transcript and timeline",
 ### 2. screencast-tutorial-video
 
 Produce a narrated, captioned 1920x1080 MP4 from an approved storyboard on the
-macOS host. Records each scene with the right engine — VHS for terminals,
+macOS host. Records each scene with the right engine, VHS for terminals,
 ffmpeg still-motion for native apps, Playwright + cliclick + avfoundation for
-the browser, command cards for abstract commands — adds ElevenLabs voice-over
+the browser, command cards for abstract commands, adds ElevenLabs voice-over
 and a caption bar, and concatenates the scenes. Triggers: "record the
 screencast from my storyboard", "produce the narrated MP4", "render the tutorial
 video with voice-over and captions".

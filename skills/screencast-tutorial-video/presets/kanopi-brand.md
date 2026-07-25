@@ -28,7 +28,7 @@ e.g. `M C P`, and file names as `CLAUDE dot m d`.
 ## Intro / outro
 
 - **Intro:** a 2-second title card from the Kanopi "AI Update" brand slide
-  (export the slide as a clean PNG — no screen chrome/notifications), built with
+  (export the slide as a clean PNG, no screen chrome/notifications), built with
   `still-scene.sh <NN> stills/00.png 2` (static, `TUT_ZOOM_MAX=1.0`). Let the
   voice-over start ~1.2s into the card so it overlaps into scene 1.
 - **Outro:** end on the product/landing page and close with the site URL, e.g.
@@ -40,9 +40,9 @@ e.g. `M C P`, and file names as `CLAUDE dot m d`.
 - **Fonts:** Montserrat for any caption bar, Roboto Mono for command cards
   (preflight downloads both).
 - **Brand color:** Kanopi green for panels/backgrounds where applicable.
-- **Captions:** by default do **not** bake in the caption bar — leave
+- **Captions:** by default do **not** bake in the caption bar, leave
   `final/NN.caption.txt` empty and add captions in the downstream captioning tool.
-- **Browser scenes:** use **Method A** (`browser-scene.sh`) for site/UI tours —
+- **Browser scenes:** use **Method A** (`browser-scene.sh`) for site/UI tours, 
   crisp, deterministic, and it records only the page (no desktop leak).
 
 ## Reference

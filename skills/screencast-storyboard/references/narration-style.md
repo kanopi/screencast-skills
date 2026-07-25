@@ -29,7 +29,7 @@ The shared voice for both `screencast-storyboard` (writing the narration) and
 
 - **Match narration to the action.** A `terminal` scene's narration should last
   about as long as the command takes to type and run. `finish-scene.sh` pads the
-  video to the narration, so over-long narration stretches a frozen frame —
+  video to the narration, so over-long narration stretches a frozen frame, 
   keep it tight.
 - **Captions are one short line.** The caption bar is a label for the scene
   ("Add the MCP server"), not a transcript. An empty caption means no bar for

@@ -73,7 +73,7 @@ synth() {
         -d "$payload")"
       if [ "$code" != "200" ]; then
         local msg="$out"
-        # On error the body is JSON, not audio — surface it and remove the stub.
+        # On error the body is JSON, not audio, surface it and remove the stub.
         [ -f "$out" ] && msg="$(cat "$out")"
         rm -f "$out"
         die "OpenAI TTS failed (HTTP $code): $msg"

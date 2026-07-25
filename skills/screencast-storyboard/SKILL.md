@@ -1,6 +1,6 @@
 ---
 name: screencast-storyboard
-description: Use when scripting a screencast or tutorial video before recording it — the user says "script a tutorial", "draft the transcript and timeline", "outline a screencast walkthrough", "plan the demo", or "write the storyboard" for showing how to set up or use a tool (e.g. add an MCP server in Claude Code or Claude Desktop). Reads the tool's real README, install command, and config so the transcript is accurate, drafts an ordered storyboard.md (scenes with type, on-screen actions, narration, one-line caption, pacing), presents STORYBOARD READY FOR APPROVAL, and stops for approval. Never fabricates config or commands. Stack-agnostic and dependency-free; the output can feed screencast-tutorial-video, Google Vids, or a human presenter.
+description: Use when scripting a screencast or tutorial video before recording it, the user says "script a tutorial", "draft the transcript and timeline", "outline a screencast walkthrough", "plan the demo", or "write the storyboard" for showing how to set up or use a tool (e.g. add an MCP server in Claude Code or Claude Desktop). Reads the tool's real README, install command, and config so the transcript is accurate, drafts an ordered storyboard.md (scenes with type, on-screen actions, narration, one-line caption, pacing), presents STORYBOARD READY FOR APPROVAL, and stops for approval. Never fabricates config or commands. Stack-agnostic and dependency-free; the output can feed screencast-tutorial-video, Google Vids, or a human presenter.
 ---
 
 # Screencast Storyboard
@@ -12,14 +12,14 @@ what the demo should cover" into an approved `storyboard.md`: an ordered list of
 scenes, each with a `type`, the on-screen actions, the spoken **narration**, a
 one-line **caption**, and **pacing**. Production is a separate skill
 (`screencast-tutorial-video`) that consumes the approved storyboard; the
-storyboard also stands on its own — it can feed Google Vids or a human
+storyboard also stands on its own, it can feed Google Vids or a human
 presenter.
 
 Two disciplines define this skill:
 
 1. **Read the real source, never fabricate.** Every command, config block, path,
-   and setting in the narration must come from the actual tool — its README,
-   `--help`, install command, or config JSON — or from asking the user. Do not
+   and setting in the narration must come from the actual tool, its README,
+   `--help`, install command, or config JSON, or from asking the user. Do not
    invent an `mcpServers` block, a `claude_desktop_config.json`, a package name,
    or a flag.
 2. **Stop at the approval gate.** Draft the storyboard, present it, emit the
@@ -47,8 +47,8 @@ Create a todo per step.
      from the tool's docs or an existing config, not remembered.
    - `--help` / `--version` output where relevant.
 
-   If the source is not available — the repo has no README, the docs are behind
-   a login, the user has not provided the config — **do not guess**. Ask the
+   If the source is not available, the repo has no README, the docs are behind
+   a login, the user has not provided the config, **do not guess**. Ask the
    user for it, or note the gap in the storyboard as `[NEEDS: real config from
    <source>]` and leave the concrete block empty. See the no-fabrication rule
    below.
@@ -98,12 +98,12 @@ tutorial that shows a made-up config teaches the viewer something false.
 
 Thoughts that mean STOP, citing [CANT](https://github.com/kanopi/cant) IDs:
 
-- "The user pre-approved, so presenting the header is redundant" (CANT-1) — it
+- "The user pre-approved, so presenting the header is redundant" (CANT-1), it
   is not; present the header and wait for a subsequent message anyway.
 - "Just this once I'll skip the gate and start recording" (CANT-6).
 - "This demo is small enough that the storyboard is overkill" (CANT-7).
 - "I know roughly what the config looks like, I'll fill it in" (CANT-3
-  fabrication) — read the real source or ask.
+  fabrication), read the real source or ask.
 - "They said 'just go', so the read-the-docs step does not apply" (CANT-19).
 
 ## Anti-rationalization table
@@ -128,6 +128,6 @@ The production skill (`screencast-tutorial-video`) later adds `tapes/`,
 
 ## Narration and caption style
 
-See `references/narration-style.md` — plain, direct, terse, active voice; no em
+See `references/narration-style.md`, plain, direct, terse, active voice; no em
 or en dashes; no marketing hype in step narration; no emojis. This is the shared
 voice with `screencast-tutorial-video`.

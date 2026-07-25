@@ -16,34 +16,34 @@ splits authoring from production into two independently-invokable skills.
 
 ## The two skills
 
-### 1. `screencast-storyboard` — author the script (dependency-free)
+### 1. `screencast-storyboard`, author the script (dependency-free)
 
 Input: what the demo should cover. It **reads the tool's real README, install
 command, and config JSON** so the transcript's commands and config are
 accurate, drafts `.tutorial-build/<slug>/storyboard.md` (ordered scenes with
 type, on-screen actions, narration, one-line caption, and pacing), presents it,
 emits `STORYBOARD READY FOR APPROVAL`, and stops for your approval. It never
-invents config or commands, and the storyboard stands on its own — it can feed
+invents config or commands, and the storyboard stands on its own, it can feed
 a human presenter or another tool.
 
 Trigger phrases: "script a tutorial", "draft the transcript and timeline for a
 demo", "outline a screencast walkthrough".
 
-### 2. `screencast-tutorial-video` — produce the video (macOS host)
+### 2. `screencast-tutorial-video`, produce the video (macOS host)
 
 Input: an approved `storyboard.md`. It records each scene with the right engine
 and assembles one MP4:
 
 | Surface | Engine |
 |---|---|
-| Terminal (Claude Code / any CLI) | **VHS** `.tape` → MP4 — declarative typing, deterministic, re-renderable |
+| Terminal (Claude Code / any CLI) | **VHS** `.tape` → MP4, declarative typing, deterministic, re-renderable |
 | Native app (Claude Desktop) | **ffmpeg `zoompan` + `drawbox`** motion over PNG stills |
 | Browser (claude.ai / dashboards) | **Playwright** (locate) + **cliclick** (visible cursor) + **ffmpeg avfoundation** (capture) |
 | Abstract command | **command card** (still frame) |
 
 Each scene gets ElevenLabs narration, a bottom caption bar, and is padded to
 the narration length; scenes concatenate into `final/tutorial.mp4`. Every scene
-is independently re-renderable — change one line, re-run one script, re-concat.
+is independently re-renderable, change one line, re-run one script, re-concat.
 No timeline video editing.
 
 Trigger phrases: "record the screencast from my storyboard", "produce the
@@ -62,7 +62,7 @@ macOS host with: a drawtext-capable `ffmpeg` (Homebrew's plain `ffmpeg` lacks
 it; the skill auto-detects and prefers keg-only `ffmpeg-full`),
 [`vhs`](https://github.com/charmbracelet/vhs),
 [`cliclick`](https://github.com/BlueM/cliclick), Node.js (`npx playwright`), and
-a TTS engine — **either** [`awaz`](https://github.com/ahmadawais/awaz) with
+a TTS engine, **either** [`awaz`](https://github.com/ahmadawais/awaz) with
 `ELEVENLABS_API_KEY` (Text-to-Speech + Voices-read permissions) **or** OpenAI
 with `OPENAI_API_KEY` + `jq` (`TUT_TTS=elevenlabs|openai` chooses; defaults to
 whichever key is set). **Screen Recording permission** must be granted to your

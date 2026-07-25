@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Preflight: check and set up everything screencast-tutorial-video needs on the
 # macOS host. Run with TUT_SLUG set. Reports every dependency's real state and
-# exits non-zero if a required one is missing — never proceed on a false green.
+# exits non-zero if a required one is missing, never proceed on a false green.
 # Ported from drupal-tutorial-video: the ddev container package injection is
 # replaced with host `brew`/`npm`, and a macOS Screen-Recording check is added.
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -37,7 +37,7 @@ brew_dep ffprobe ffmpeg
 brew_dep vhs vhs
 brew_dep cliclick cliclick
 
-# ffmpeg must have the drawtext filter (libfreetype) — every caption bar and
+# ffmpeg must have the drawtext filter (libfreetype), every caption bar and
 # command card depends on it. Homebrew's plain `ffmpeg` is built WITHOUT it; the
 # keg-only `ffmpeg-full` has it. lib.sh resolves $FFMPEG to a drawtext-capable
 # binary if one exists; here we verify and, if not, install ffmpeg-full.

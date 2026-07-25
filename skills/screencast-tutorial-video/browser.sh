@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # The browser "brain": launch a headed Chromium at a known position/size, then
 # locate elements and return their on-screen box. It never does the visible
-# clicking (Playwright's input is synthetic and invisible on camera) — it finds
+# clicking (Playwright's input is synthetic and invisible on camera), it finds
 # the element; hands.sh (cliclick) moves the real cursor and clicks.
 #
 #   ./browser.sh start "https://claude.ai"     # launch window at WIN_X,WIN_Y size WIN_W,WIN_H
@@ -13,7 +13,7 @@
 #   ./browser.sh stop
 #
 # box returns VIEWPORT coordinates. Add the calibration offset (OFF_X/OFF_Y in
-# lib.sh) before passing to hands.sh — see references/browser-playwright.md.
+# lib.sh) before passing to hands.sh, see references/browser-playwright.md.
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$HERE/lib.sh"
 

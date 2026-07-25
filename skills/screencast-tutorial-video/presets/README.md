@@ -47,7 +47,7 @@ applied per video. `kanopi.env` + `kanopi-brand.md` are the worked example.
 | `TUT_ZOOM_MAX` | still-scene.sh | Ken Burns zoom factor (`1.0` = static) |
 | `TUT_WIN_X/Y/W/H`, `TUT_OFF_X/Y`, `TUT_AVF_SCREEN` | Method B browser | Window geometry, cursor offset, capture index |
 
-Do **not** set `TUT_SLUG` or `TUT_BUILD_DIR` in a preset — those are per video.
+Do **not** set `TUT_SLUG` or `TUT_BUILD_DIR` in a preset, those are per video.
 
 ## Notes
 

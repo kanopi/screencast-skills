@@ -34,4 +34,4 @@ Add this to `claude_desktop_config.json` (see `config.example.json`):
 
 ## Tools
 
-- `get_forecast(city: string)` — returns a canned forecast for the named city.
+- `get_forecast(city: string)`, returns a canned forecast for the named city.

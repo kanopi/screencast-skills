@@ -20,5 +20,5 @@ cd "$HDIR"
   -vf "drawtext=fontfile=$FONT_MONO:textfile='cards/${NN}.cmd.txt':fontcolor=white:fontsize=44:x=(w-text_w)/2:y=(h-text_h)/2:line_spacing=14" \
   -codec:v libx264 -preset ultrafast -pix_fmt yuv420p "scenes/${NN}.mp4" >"scenes/${NN}.card.log" 2>&1
 
-[ -f "scenes/${NN}.mp4" ] || die "ffmpeg did not produce scenes/${NN}.mp4 (see $HDIR/scenes/${NN}.card.log; a missing drawtext filter is the usual cause — run preflight.sh)"
+[ -f "scenes/${NN}.mp4" ] || die "ffmpeg did not produce scenes/${NN}.mp4 (see $HDIR/scenes/${NN}.card.log; a missing drawtext filter is the usual cause, run preflight.sh)"
 echo "command card scene $NN -> $HDIR/scenes/${NN}.mp4 (${DUR}s)"

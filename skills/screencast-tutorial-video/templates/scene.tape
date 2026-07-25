@@ -1,7 +1,7 @@
 # VHS starter tape for a terminal scene. Copy this per scene, edit the body, then:
 #   ./render-tape.sh <NN> path/to/this.tape
 # render-tape.sh forces Width/Height to 1920x1080 and sets Output to
-# scenes/NN.mp4 — you do not need Output/Width/Height lines here, but the other
+# scenes/NN.mp4, you do not need Output/Width/Height lines here, but the other
 # Set directives below are yours to tune. See references/terminal-vhs.md.
 
 Set FontSize 26

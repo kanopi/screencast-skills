@@ -18,13 +18,13 @@ cleanly. Your `Set FontSize/Theme/TypingSpeed/Padding` lines are preserved.
 ## Sizing
 
 Output must be 1920x1080 to concat with the other scene types. `render-tape.sh`
-handles the Width/Height; pick a `FontSize` (24–30 reads well at 1080p) and
+handles the Width/Height; pick a `FontSize` (24, 30 reads well at 1080p) and
 `Padding` that fill the frame without wrapping long commands. Test one scene and
 adjust the font size before rendering the rest.
 
 ## Pacing
 
-- `TypingSpeed 80ms–100ms` looks like natural human typing. Faster reads as a
+- `TypingSpeed 80ms, 100ms` looks like natural human typing. Faster reads as a
   paste; slower drags.
 - `Sleep` before `Enter` to let the viewer read the typed command; `Sleep`
   after to let output settle. Match the total tape length to the narration for
@@ -54,8 +54,8 @@ Use `Hide`/`Show` to run setup you do not want on camera (export a fake key,
 - **Real commands only.** The tape's commands come from the approved storyboard,
   which read them from the tool's real docs. Do not invent flags.
 - **Secrets.** If a command needs an API key, set a throwaway/example value with
-  a `Hide`/`Show` block, or show a redacted placeholder — never a real key.
+  a `Hide`/`Show` block, or show a redacted placeholder, never a real key.
 - **Long output that scrolls** can look busy; prefer commands whose output fits,
   or `Sleep` long enough that the final state is readable.
 - VHS renders in its own headless terminal, so what you see is exactly what
-  renders — no font/permission surprises like a live capture.
+  renders, no font/permission surprises like a live capture.

@@ -1,5 +1,5 @@
 // Method A browser engine: Playwright records the page directly to video at a
-// fixed 1920x1080 (headless, off-screen) — no OS screen capture, no Retina, no
+// fixed 1920x1080 (headless, off-screen), no OS screen capture, no Retina, no
 // permissions, and it records ONLY the page (never the desktop). Produces
 // scenes/NN.mp4. Launched by browser-scene.sh.
 //

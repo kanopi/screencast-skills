@@ -1,6 +1,6 @@
 ---
 name: screencast-tutorial-video
-description: Use when producing the actual screencast video from an approved storyboard — the user says "record the screencast", "produce the narrated MP4", "render the tutorial video", "make the video from my storyboard", or "cut the screencast together". Records each scene on the macOS host with the right engine (VHS for terminals, ffmpeg still-motion for native apps like Claude Desktop, Playwright + cliclick for the browser, command cards for abstract commands), generates ElevenLabs voice-over via awaz, overlays a caption bar, and concatenates the scenes into one 1920x1080 MP4. Requires an approved storyboard.md from screencast-storyboard; if none exists, route there first. Never claims a rendered video that was not produced.
+description: Use when producing the actual screencast video from an approved storyboard, the user says "record the screencast", "produce the narrated MP4", "render the tutorial video", "make the video from my storyboard", or "cut the screencast together". Records each scene on the macOS host with the right engine (VHS for terminals, ffmpeg still-motion for native apps like Claude Desktop, Playwright + cliclick for the browser, command cards for abstract commands), generates ElevenLabs voice-over via awaz, overlays a caption bar, and concatenates the scenes into one 1920x1080 MP4. Requires an approved storyboard.md from screencast-storyboard; if none exists, route there first. Never claims a rendered video that was not produced.
 ---
 
 # Screencast Tutorial Video
@@ -11,19 +11,19 @@ This is the **production** half of the screencast workflow. It consumes an
 approved `storyboard.md` (from `screencast-storyboard`) and produces one
 narrated, captioned 1920x1080 MP4 that shows the real tool doing the real thing.
 
-Everything runs natively on the **macOS host** — no ddev, no container. One
+Everything runs natively on the **macOS host**, no ddev, no container. One
 engine per surface:
 
 | Surface | Engine | Script |
 |---|---|---|
 | Terminal (Claude Code / any CLI) | VHS `.tape` → MP4 | `render-tape.sh` |
 | Native app (Claude Desktop) | ffmpeg `zoompan` + `drawbox` over a PNG still | `still-scene.sh` |
-| Browser — **docs / UI tours (recommended)** | Playwright records the page headless at 1080p (no OS capture, no permissions, records only the page) | `browser-scene.sh` |
-| Browser — **real cursor on camera** | Playwright (locate) + cliclick (visible cursor) + ffmpeg avfoundation (capture) | `browser.sh` + `hands.sh` + `record-browser.sh` (or automated: `browser-scene-screencap.sh`) |
+| Browser, **docs / UI tours (recommended)** | Playwright records the page headless at 1080p (no OS capture, no permissions, records only the page) | `browser-scene.sh` |
+| Browser, **real cursor on camera** | Playwright (locate) + cliclick (visible cursor) + ffmpeg avfoundation (capture) | `browser.sh` + `hands.sh` + `record-browser.sh` (or automated: `browser-scene-screencap.sh`) |
 | Abstract command | command card (still) | `make-card.sh` |
 
 **Two browser engines.** Method A (`browser-scene.sh`) renders the page
-off-screen and records only the page — crisp, deterministic, no Screen-Recording
+off-screen and records only the page, crisp, deterministic, no Screen-Recording
 permission, no cursor calibration, and nothing else on your desktop can leak into
 frame. Use it for almost everything. Method B (the cliclick/avfoundation split)
 is only for when you must show the real macOS cursor performing clicks; it
@@ -31,14 +31,14 @@ captures the live screen, so it needs the permission and a clean desktop (see th
 privacy caution in `references/browser-playwright.md`).
 
 Each scene is padded to its narration, gets a caption bar, and concatenates into
-`final/tutorial.mp4`. Every scene is independently re-renderable — change one
+`final/tutorial.mp4`. Every scene is independently re-renderable, change one
 line, re-run one script, re-concat. No timeline editing.
 
 ## Requirements (hard)
 
 - An approved `storyboard.md` at `.tutorial-build/<slug>/storyboard.md`. If it is
-  missing, direct the user to `screencast-storyboard` first — do not invent one.
-- macOS host with `ffmpeg` (a drawtext-capable build — `ffmpeg-full`; preflight
+  missing, direct the user to `screencast-storyboard` first, do not invent one.
+- macOS host with `ffmpeg` (a drawtext-capable build, `ffmpeg-full`; preflight
   handles this), `vhs`, `cliclick`, Node.js + Playwright, and a TTS engine:
   **either** ElevenLabs (`awaz` + `ELEVENLABS_API_KEY`, Text-to-Speech +
   Voices-read permissions) **or** OpenAI (`OPENAI_API_KEY` + `jq`). Pick with
@@ -52,10 +52,10 @@ line, re-run one script, re-concat. No timeline editing.
 
 Run every script with `export TUT_SLUG=<slug>` set, **from the directory that
 holds `.tutorial-build/`** (the build dir is resolved relative to the working
-directory). To run from elsewhere, `export HDIR=<absolute build dir>` — the
+directory). To run from elsewhere, `export HDIR=<absolute build dir>`, the
 scripts and `browser-scene.mjs` both honor it, so scenes never land in the wrong
 folder. Scripts read `lib.sh` for shared paths and settings. For house defaults
-(voice, tone, resolution) a preset loads automatically — `TUT_PRESET` defaults to
+(voice, tone, resolution) a preset loads automatically, `TUT_PRESET` defaults to
 `thejimbirch` (the repo owner's personal preset); `export TUT_PRESET=kanopi` for
 the Kanopi kit, or `TUT_PRESET=none` to skip. The Kanopi kit's non-env
 conventions (pronunciation lexicon, intro/outro, fonts) are in
@@ -111,11 +111,11 @@ Create a todo per step.
 1. **Load the approved storyboard.** Read `.tutorial-build/<slug>/storyboard.md`.
    If it does not exist, tell the user to run `screencast-storyboard` first and
    stop. If any scene still contains a `[NEEDS: ...]` marker, ask for the real
-   value before recording that scene — do not fabricate it.
+   value before recording that scene, do not fabricate it.
 
 2. **Preflight.** `export TUT_SLUG=<slug>` then `./preflight.sh`. Report every
    dependency's real state. If it exits non-zero (a required dep is missing),
-   **do not proceed and do not claim any video was produced** — report the
+   **do not proceed and do not claim any video was produced**, report the
    blocker.
 
 3. **Pick a voice.** Run `./narrate.sh voices` (lists ElevenLabs voices via
@@ -128,7 +128,7 @@ Create a todo per step.
      `./render-tape.sh NN <tape>`.
    - `desktop-still`: capture `stills/NN.png`, then
      `./still-scene.sh NN stills/NN.png <dur> [highlight]`.
-   - `browser-action` — **Method A (default):** write a scene spec (URL + `steps`:
+   - `browser-action`, **Method A (default):** write a scene spec (URL + `steps`:
      scroll / highlight / wait) and `./browser-scene.sh NN <spec.json>`. It waits
      for fonts (no FOUT) and records only the page. See
      `references/browser-playwright.md` for the spec format. **Method B** (real
@@ -149,7 +149,7 @@ Create a todo per step.
    `TUT_TTS_FLAGS` (e.g. `--speed`, `--stability`); OpenAI model via
    `TUT_OPENAI_TTS_MODEL`.
    **Pronunciation:** the OpenAI `instructions` field (`TUT_TTS_INSTRUCTIONS`) is
-   unreliable for names — if a brand/term is mispronounced, respell it
+   unreliable for names, if a brand/term is mispronounced, respell it
    phonetically in the narration text itself (e.g. write "CAN-uh-pee" for
    "Kanopi"). Adjust the syllable emphasis until it lands.
 
@@ -178,7 +178,7 @@ Create a todo per step.
 | Mistake | Fix |
 |---|---|
 | Using `@elevenlabs/cli` for narration | It has no TTS. Use `awaz` (`npm i -g awaz`) or OpenAI via `narrate.sh`. |
-| Reaching for Method B (screen capture) by default | Use Method A (`browser-scene.sh`) for tours — it records only the page. Method B films the whole screen and can leak other windows/notifications. |
+| Reaching for Method B (screen capture) by default | Use Method A (`browser-scene.sh`) for tours, it records only the page. Method B films the whole screen and can leak other windows/notifications. |
 | A flash of unstyled text at a scene start | Method A waits for `document.fonts.ready` and trims the first ~1.5s; keep that lead-trim when assembling. |
 | Scenes landing in the wrong folder | Run from the build parent, or `export HDIR=<absolute>` so `.sh` and `.mjs` agree. |
 | Playwright doing the click (Method B) | Its input is invisible on camera. Click with `hands.sh` (cliclick); use `browser.sh` only to locate. |
