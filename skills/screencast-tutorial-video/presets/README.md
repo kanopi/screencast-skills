@@ -1,13 +1,15 @@
 # Presets
 
 A preset captures a brand's or client's house style for screencast videos so
-every video starts consistent. Enable one before running any script:
+every video starts consistent. Switch presets before running any script:
 
 ```bash
 export TUT_PRESET=kanopi   # sources presets/kanopi.env
+export TUT_PRESET=none      # skip presets entirely
 ```
 
-`lib.sh` sources `presets/<name>.env` when `TUT_PRESET` is set. A preset only
+`lib.sh` sources `presets/<name>.env`, defaulting to **`thejimbirch`** (the repo
+owner's personal preset) when `TUT_PRESET` is unset. A preset only
 sets **environment defaults**; the conventions that can't be an env var
 (pronunciation, intro/outro, fonts) live in a companion `<name>-brand.md` and are
 applied per video. `kanopi.env` + `kanopi-brand.md` are the worked example.

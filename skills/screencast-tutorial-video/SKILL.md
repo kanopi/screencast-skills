@@ -55,10 +55,12 @@ holds `.tutorial-build/`** (the build dir is resolved relative to the working
 directory). To run from elsewhere, `export HDIR=<absolute build dir>` — the
 scripts and `browser-scene.mjs` both honor it, so scenes never land in the wrong
 folder. Scripts read `lib.sh` for shared paths and settings. For house defaults
-(voice, tone, resolution) `export TUT_PRESET=<brand>` (e.g. `kanopi`) to load
-`presets/<brand>.env`; the Kanopi kit's non-env conventions (pronunciation
-lexicon, intro/outro, fonts) are in `presets/kanopi-brand.md`. To make a preset
-for another brand/client, see `presets/README.md`.
+(voice, tone, resolution) a preset loads automatically — `TUT_PRESET` defaults to
+`thejimbirch` (the repo owner's personal preset); `export TUT_PRESET=kanopi` for
+the Kanopi kit, or `TUT_PRESET=none` to skip. The Kanopi kit's non-env
+conventions (pronunciation lexicon, intro/outro, fonts) are in
+`presets/kanopi-brand.md`. To make a preset for another brand/client, see
+`presets/README.md`.
 
 | Script | Purpose |
 |---|---|

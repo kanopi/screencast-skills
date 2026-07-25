@@ -9,9 +9,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- **Brand presets** — `export TUT_PRESET=<name>` sources `presets/<name>.env` for
-  house voice/tone/format defaults (values use `${VAR:-default}` so explicit env
-  still wins). Ships `presets/kanopi.env` (OpenAI TTS, voice `marin`, tone,
+- **Brand presets** — a preset sources `presets/<name>.env` for house
+  voice/tone/format defaults (values use `${VAR:-default}` so explicit env still
+  wins). `TUT_PRESET` defaults to `thejimbirch` (repo owner's personal preset);
+  `export TUT_PRESET=kanopi` switches, `TUT_PRESET=none` skips. Ships
+  `presets/thejimbirch.env`, `presets/kanopi.env` (OpenAI TTS, voice `marin`, tone,
   1920x1080/25fps) and `presets/kanopi-brand.md` (pronunciation lexicon —
   Kanopi → "CAN-uh-pee" — intro/outro pattern, fonts/colors, caption/engine
   conventions). `presets/README.md` documents how to author a preset for another

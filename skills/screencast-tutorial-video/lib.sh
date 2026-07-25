@@ -9,10 +9,12 @@
 # /var/www/html paths, Xvfb :99) is gone. Everything runs natively on the host.
 set -euo pipefail
 
-# Optional brand/project preset. `export TUT_PRESET=kanopi` sources
-# presets/kanopi.env (next to this lib) to set house voice, tone, and format
-# defaults. Presets use ${VAR:-default}, so an explicit env var still wins.
-if [ -n "${TUT_PRESET:-}" ]; then
+# Brand/project preset. Defaults to the repo owner's personal preset
+# (`thejimbirch`); switch with `export TUT_PRESET=kanopi` (or another), or skip
+# presets entirely with `export TUT_PRESET=none`. Presets use ${VAR:-default}, so
+# an explicit env var still wins. See presets/README.md.
+TUT_PRESET="${TUT_PRESET:-thejimbirch}"
+if [ "$TUT_PRESET" != "none" ]; then
   _LIBDIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
   if [ -f "$_LIBDIR/presets/${TUT_PRESET}.env" ]; then
     # shellcheck disable=SC1090
