@@ -19,15 +19,23 @@ Name them `stills/NN.png` matching the scene number.
 ## Animate
 
 ```bash
-./still-scene.sh 04 stills/04.png 6                    # 6s, centered zoom
+./still-scene.sh 04 stills/04.png 6                    # 6s, Ken Burns pan + zoom
 ./still-scene.sh 04 stills/04.png 6 "820:300:280:90"   # highlight x:y:w:h (source px)
 ```
 
 - The optional 4th arg is a highlight box in **source-image pixels**
   (`x:y:w:h`). It is drawn before the zoom, so it stays anchored to the content
-  as the frame zooms in toward it.
-- `TUT_ZOOM_MAX` (default `1.25`) sets the final zoom factor; `1.0` disables the
-  zoom for a static frame.
+  as the frame zooms in toward it. With a highlight, the move zooms **toward the
+  box** (no pan).
+- With **no** highlight, the frame does a real **Ken Burns** move: it zooms while
+  drifting diagonally, controlled by `TUT_PAN_X` / `TUT_PAN_Y` (each `-1..1`,
+  default `0.5` / `0.35`; a fraction of the margin the zoom opens up, so the crop
+  is always in-bounds and text never clips).
+- `TUT_ZOOM_MAX` (default `1.25`) sets the final zoom factor; `1.0` disables both
+  zoom and pan for a fully static frame.
+- The move is **jitter-free**: zoompan runs on a `TUT_SS`x supersample (default
+  `4`) of the frame, so the crop offset steps on a fraction-of-a-pixel grid
+  instead of shaking a whole pixel at a time. Lower `TUT_SS` if renders are slow.
 - Duration should roughly match the scene's narration.
 
 ## Framing a config flow
