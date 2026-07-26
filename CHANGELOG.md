@@ -5,6 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.3] - 2026-07-26
+
+### Fixed
+
+- `still-scene.sh` now produces a smooth, jitter-free Ken Burns move. It ran
+  `zoompan` at the output resolution, so the per-frame crop offset stepped a
+  whole pixel at a time and the frame visibly shook, and it only ever zoomed
+  toward center. It now runs `zoompan` on a `TUT_SS`x supersample (default `4`)
+  so the offset lands on a fraction-of-a-pixel grid, and adds a real diagonal
+  pan via `TUT_PAN_X` / `TUT_PAN_Y` (fractions of the zoom margin, so the crop
+  stays in-bounds and text never clips). `TUT_ZOOM_MAX=1.0` still yields a fully
+  static frame, and the highlight path still zooms toward the box.
+
 ## [1.0.2] - 2026-07-25
 
 ### Changed
