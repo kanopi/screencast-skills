@@ -53,10 +53,12 @@ synth() {
       local voice="${TUT_VOICE:-}"
       # shellcheck disable=SC2086
       if [ -n "$voice" ]; then
-        awaz -v "$voice" -o "$out" ${TUT_TTS_FLAGS:-} "$text"
+        # NB: --voice, not -v: the global "-v, --version" flag shadows speak's "-v".
+        awaz speak --no-play --no-stream --voice "$voice" -o "$out" ${TUT_TTS_FLAGS:-} "$text"
       else
-        awaz -o "$out" ${TUT_TTS_FLAGS:-} "$text"
+        awaz speak --no-play --no-stream -o "$out" ${TUT_TTS_FLAGS:-} "$text"
       fi
+      [ -s "$out" ] || die "awaz reported success but wrote no audio to $out"
       ;;
     openai)
       [ -n "${OPENAI_API_KEY:-}" ] || die "OPENAI_API_KEY is not set"
