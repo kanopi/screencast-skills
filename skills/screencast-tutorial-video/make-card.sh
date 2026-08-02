@@ -16,8 +16,11 @@ mkdir -p "$HDIR/cards"
 printf '$ %s\n' "$TEXT" > "$HDIR/cards/${NN}.cmd.txt"
 
 cd "$HDIR"
-"$FFMPEG" -y -f lavfi -i "color=c=black:s=$RES:d=$DUR:r=$FPS" \
-  -vf "drawtext=fontfile=$FONT_MONO:textfile='cards/${NN}.cmd.txt':fontcolor=white:fontsize=44:x=(w-text_w)/2:y=(h-text_h)/2:line_spacing=14" \
+CARD_BG="${TUT_CARD_BG:-black}"    # e.g. 0x153e35 for a brand background
+CARD_FG="${TUT_CARD_FG:-white}"
+CARD_FONT="${TUT_CARD_FONT:-$FONT_MONO}"  # absolute path to a brand font to override the mono default
+"$FFMPEG" -y -f lavfi -i "color=c=${CARD_BG}:s=$RES:d=$DUR:r=$FPS" \
+  -vf "drawtext=fontfile=$CARD_FONT:textfile='cards/${NN}.cmd.txt':fontcolor=${CARD_FG}:fontsize=44:x=(w-text_w)/2:y=(h-text_h)/2:line_spacing=14" \
   -codec:v libx264 -preset ultrafast -pix_fmt yuv420p "scenes/${NN}.mp4" >"scenes/${NN}.card.log" 2>&1
 
 [ -f "scenes/${NN}.mp4" ] || die "ffmpeg did not produce scenes/${NN}.mp4 (see $HDIR/scenes/${NN}.card.log; a missing drawtext filter is the usual cause, run preflight.sh)"
