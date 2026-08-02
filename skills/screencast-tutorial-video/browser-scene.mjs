@@ -11,6 +11,11 @@
 //   step kinds: {"waitMs":N} | {"highlightText":"..."} | {"highlightSelector":"css"}
 //     | {"clearHighlights":true} | {"scrollToText":"..."} | {"scrollTop":true}
 //     | {"scrollBy":px,"overMs":N} | {"scrollThrough":true,"overMs":N}
+//   interaction steps (multi-page tours):
+//     {"goto":"url"} | {"click":"locator"} | {"press":"Enter"}
+//     | {"type":{"selector":"...","text":"...","delayMs":N}}
+//     | {"typeJs":{"selector":"...","text":"...","delayMs":N}}
+//     | {"submit":"form css"}
 //
 // Env: HDIR, FFMPEG, OUT (optional).
 
@@ -78,18 +83,65 @@ async function smoothScrollTo(page, targetY, overMs) {
   }, { targetY, overMs });
 }
 
+// Wait for web fonts to finish loading so no flash of unstyled text (FOUT) is
+// recorded. The assembly also trims the first ~1.5s of each clip as a backstop.
+async function settle(page) {
+  await page.evaluate(() => (document.fonts && document.fonts.ready) ? document.fonts.ready : Promise.resolve()).catch(() => {});
+  await page.waitForTimeout(700);
+}
+
 const browser = await chromium.launch({ headless: true });
 const context = await browser.newContext({ viewport: size, deviceScaleFactor: 2, recordVideo: { dir: tmpDir, size } });
 const page = await context.newPage();
-await page.goto(spec.url, { waitUntil: 'networkidle', timeout: 60000 }).catch(() => {});
-// Wait for web fonts to finish loading so no flash of unstyled text (FOUT) is
-// recorded. The assembly also trims the first ~1.5s of each clip as a backstop.
-await page.evaluate(() => (document.fonts && document.fonts.ready) ? document.fonts.ready : Promise.resolve()).catch(() => {});
-await page.waitForTimeout(700);
+// 'load', not 'networkidle': apps that hold connections open (Google Docs,
+// anything with websockets/analytics beacons) never reach networkidle, and the
+// full timeout would be burned INSIDE the recording. Explicit waitMs steps
+// cover any post-load rendering.
+await page.goto(spec.url, { waitUntil: 'load', timeout: 30000 }).catch(() => {});
+await settle(page);
 
 for (const step of spec.steps || []) {
   if (step.waitMs) await sleep(step.waitMs);
-  else if (step.highlightText) await highlight(page, page.locator(`text=${step.highlightText}`));
+  else if (step.goto) {
+    await page.goto(step.goto, { waitUntil: 'load', timeout: 30000 }).catch(() => {});
+    await settle(page);
+  } else if (step.click) {
+    await page.locator(step.click).first().click({ timeout: 10000 }).catch((e) => console.error(`click failed: ${step.click}: ${e.message.split('\n')[0]}`));
+  } else if (step.type) {
+    // Real keystrokes via Playwright. If the field's UI re-renders mid-typing
+    // (live search), keystrokes get swallowed, use typeJs instead.
+    const { selector, text, delayMs } = step.type;
+    const el = page.locator(selector).first();
+    await el.click({ timeout: 10000 }).catch(() => {});
+    await el.pressSequentially(text, { delay: delayMs || 60 }).catch((e) => console.error(`type failed: ${selector}: ${e.message.split('\n')[0]}`));
+  } else if (step.typeJs) {
+    // Incremental value-setting with input events: survives live-search UIs
+    // that re-render the field mid-typing. Visually identical to typing.
+    const { selector, text, delayMs } = step.typeJs;
+    await page.locator(selector).first().click({ timeout: 10000 }).catch(() => {});
+    await page.evaluate(async ({ selector, text, delayMs }) => {
+      const el = document.querySelector(selector);
+      if (!el) return;
+      el.focus();
+      const setter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value').set;
+      for (let i = 1; i <= text.length; i++) {
+        setter.call(el, text.slice(0, i));
+        el.dispatchEvent(new Event('input', { bubbles: true }));
+        await new Promise((r) => setTimeout(r, delayMs || 55));
+      }
+    }, { selector, text, delayMs }).catch((e) => console.error(`typeJs failed: ${e.message.split('\n')[0]}`));
+  } else if (step.submit) {
+    // Native form submission; requestSubmit fires the submit event so JS
+    // handlers run, plain submit() is the fallback for detached handlers.
+    await page.evaluate((sel) => {
+      const f = document.querySelector(sel);
+      if (f) (f.requestSubmit ? f.requestSubmit() : f.submit());
+    }, step.submit).catch((e) => console.error(`submit failed: ${e.message.split('\n')[0]}`));
+    await page.waitForLoadState('load').catch(() => {});
+    await settle(page);
+  } else if (step.press) {
+    await page.keyboard.press(step.press).catch(() => {});
+  } else if (step.highlightText) await highlight(page, page.locator(`text=${step.highlightText}`));
   else if (step.highlightSelector) await highlight(page, page.locator(step.highlightSelector));
   else if (step.clearHighlights) await clearHighlights(page);
   else if (step.scrollTop) await smoothScrollTo(page, 0, step.overMs || 800);

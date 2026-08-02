@@ -129,9 +129,10 @@ Create a todo per step.
    - `desktop-still`: capture `stills/NN.png`, then
      `./still-scene.sh NN stills/NN.png <dur> [highlight]`.
    - `browser-action`, **Method A (default):** write a scene spec (URL + `steps`:
-     scroll / highlight / wait) and `./browser-scene.sh NN <spec.json>`. It waits
-     for fonts (no FOUT) and records only the page. See
-     `references/browser-playwright.md` for the spec format. **Method B** (real
+     scroll / highlight / wait, plus goto / click / type / submit for multi-page
+     flows) and `./browser-scene.sh NN <spec.json>`. It waits for fonts (no FOUT)
+     and records only the page. See `references/browser-playwright.md` for the
+     spec format. **Method B** (real
      on-camera cursor) only when needed: `./browser.sh start "<url>"`,
      `./record-browser.sh start NN`, drive with `browser.sh box` +
      `hands.sh move/click/type`, `./record-browser.sh stop NN`, and calibrate the
