@@ -5,6 +5,23 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+
+- `browser-scene.mjs` (Method A) supports interaction steps for multi-page
+  tours: `goto`, `click`, `press`, `type` (real keystrokes), `typeJs`
+  (JS value-setting for live-search fields that re-render mid-typing and
+  swallow real keystrokes), and `submit` (native `requestSubmit`). Documented
+  in `references/browser-playwright.md`.
+
+### Changed
+
+- Method A page loads wait for `load` instead of `networkidle`. Apps that hold
+  connections open (Google Docs, websockets) never reach networkidle, so every
+  navigation burned its full timeout inside the recording; explicit `waitMs`
+  steps cover post-load rendering.
+
 ## [1.0.5] - 2026-08-02
 
 ### Removed

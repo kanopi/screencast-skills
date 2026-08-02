@@ -44,6 +44,31 @@ Step kinds:
 | `{"scrollThrough": true, "overMs": N}` | Smooth-scroll top→bottom over N ms (adapts to page length; bigger N = slower) |
 | `{"scrollTop": true, "overMs": N}` | Smooth-scroll back to top |
 
+Interaction steps, for multi-page tours (click through a flow, run a search):
+
+| Step | Effect |
+|---|---|
+| `{"goto": "url"}` | Navigate to a new URL mid-scene (waits for `load` + fonts) |
+| `{"click": "locator"}` | Click the first match (Playwright locator: `text=…`, css, `role=…`) |
+| `{"type": {"selector": "css", "text": "…", "delayMs": N}}` | Focus the field and type real keystrokes, one every N ms (default 60) |
+| `{"typeJs": {"selector": "css", "text": "…", "delayMs": N}}` | Set the field's value character by character via JS `input` events |
+| `{"press": "Enter"}` | Press a key on the focused element |
+| `{"submit": "form css"}` | Submit the form natively (`requestSubmit`), then wait for the new page |
+
+**`type` vs `typeJs`:** prefer `type` (real keystrokes). But a live-search UI
+that re-renders its input mid-typing silently swallows real keystrokes (the
+locator points at a detached node), if the typed text stops short in the
+recording, switch to `typeJs`, which looks identical on camera.
+
+**Page loads use `load`, not `networkidle`.** Apps that hold connections open
+(Google Docs, websockets, analytics beacons) never reach networkidle, and the
+whole timeout would be recorded as dead air. Budget post-load rendering with an
+explicit `waitMs` after `goto`/`click`.
+
+**Cosmetic blockers:** dismiss cookie banners and tooltips with a `click` step
+before the tour starts (e.g. OneTrust: `{"click": "#onetrust-accept-btn-handler"}`,
+preceded by a `waitMs` long enough for the banner to mount, it loads async).
+
 ### FOUT (flash of unstyled text)
 
 Web fonts load a beat after first paint, so the very start of a recording can
