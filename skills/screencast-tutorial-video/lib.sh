@@ -54,6 +54,9 @@ OFF_Y="${TUT_OFF_Y:-0}"
 # HDIR wins, so wrappers can pass an absolute path to both the .sh scripts and
 # browser-scene.mjs (they must agree, or scenes land in the wrong dir).
 HDIR="${HDIR:-${TUT_BUILD_DIR:-.tutorial-build}/${TUT_SLUG}}"
+# Resolve to an absolute path: several scripts cd into $HDIR, which would break
+# relative font/asset paths (ffmpeg falls back to a default font silently).
+case "$HDIR" in /*) ;; *) HDIR="$(pwd)/${HDIR}" ;; esac
 
 # Fonts, downloaded into the build dir by preflight so ffmpeg can read them.
 FONT_REGULAR="${TUT_FONT_REGULAR:-${HDIR}/assets/Montserrat-Regular.ttf}"
