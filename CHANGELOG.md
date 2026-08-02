@@ -5,6 +5,35 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.4] - 2026-08-02
+
+### Fixed
+
+- `narrate.sh` produced no audio with current awaz (0.0.4): it invoked awaz
+  without the `speak` subcommand, so `-v` was parsed as the global `--version`
+  flag and the script reported success while writing nothing. It now calls
+  `awaz speak --no-play --no-stream --voice ...` and fails loudly if no audio
+  file lands. (#3)
+- `lib.sh` resolves the build dir (`HDIR`) to an absolute path. Scripts that
+  cd into the build dir (`make-card.sh`, `finish-scene.sh`) broke the relative
+  font paths, and ffmpeg drawtext silently fell back to a default font. (#3)
+
+### Added
+
+- `make-card.sh` honors `TUT_CARD_BG`, `TUT_CARD_FG`, and `TUT_CARD_FONT` so
+  command cards can be brand-styled; defaults are unchanged. (#3)
+- `presets/kanopi-brand.md` is now a complete brand kit: the Montserrat type
+  scale, the full color palette, a Kanopi VHS terminal theme, the fontTools
+  command for instancing static weights (ffmpeg drawtext only renders a
+  variable font's default instance), and a documented monospace exception for
+  live terminal scenes. (#3)
+
+### Changed
+
+- The `kanopi` preset now uses ElevenLabs with the house cloned voice, static
+  stills (`TUT_ZOOM_MAX=1.0`), and the brand card background. The pronunciation
+  lexicon writes Kanopi as plain "canopy". (#3)
+
 ## [1.0.3] - 2026-07-26
 
 ### Fixed
