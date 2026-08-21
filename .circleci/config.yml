@@ -1,0 +1,112 @@
+version: 2.1
+
+# Ported from .github/workflows/test.yml (now removed) to reduce GitHub
+# Actions minute usage. The six Actions jobs are consolidated into two
+# CircleCI jobs so each push spins up two containers instead of six.
+#
+# Still on GitHub Actions (deliberately):
+#   - behavioral-evals.yml weekly schedule + manual dispatch only.
+#   - release-artifacts.yml runs per release; uses the built-in GITHUB_TOKEN
+#                          to upload release assets.
+
+jobs:
+  tests-and-validation:
+    docker:
+      - image: cimg/python:3.12
+    resource_class: small
+    steps:
+      - checkout
+
+      - run:
+          name: Install BATS, jq, and yq
+          command: |
+            sudo apt-get update
+            sudo apt-get install -y bats jq
+            sudo wget -qO /usr/local/bin/yq https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64
+            sudo chmod +x /usr/local/bin/yq
+
+      - run:
+          name: Install PyYAML
+          command: pip install pyyaml
+
+      - run:
+          name: Run BATS tests
+          command: bats tests/test-plugin.bats
+
+      - run:
+          name: Validate SKILL.md and AGENT.md frontmatter
+          command: |
+            chmod +x scripts/validate-frontmatter.sh
+            ./scripts/validate-frontmatter.sh
+
+      - run:
+          name: Check Codex TOML / openai.yaml parity
+          command: |
+            chmod +x scripts/check-codex-parity.sh
+            ./scripts/check-codex-parity.sh
+
+      - run:
+          name: Scan for secrets
+          command: |
+            # Check for potential hardcoded secrets in shipped content.
+            scan_dirs="skills"
+            [ -d agents ] && scan_dirs="$scan_dirs agents"
+            [ -d docs ] && scan_dirs="$scan_dirs docs"
+            if grep -ri "password\s*=\|api_key\s*=\|secret\s*=" $scan_dirs | grep -v "example\|placeholder\|TODO\|test-fixture"; then
+              echo "❌ Potential hardcoded secrets found"
+              exit 1
+            else
+              echo "✅ No hardcoded secrets detected"
+            fi
+
+      - run:
+          name: Check for merge conflict markers
+          # The conflict markers are built with printf because a literal
+          # run of < characters trips CircleCI's << pipeline-parameter parser.
+          command: |
+            scan_dirs="skills"
+            [ -d agents ] && scan_dirs="$scan_dirs agents"
+            [ -d docs ] && scan_dirs="$scan_dirs docs"
+            open_marker=$(printf '<%.0s' 1 2 3 4 5 6 7)
+            close_marker=$(printf '>%.0s' 1 2 3 4 5 6 7)
+            if grep -r "^$open_marker \|^=======$\|^$close_marker " $scan_dirs 2>/dev/null; then
+              echo "❌ Found merge conflict markers"
+              exit 1
+            else
+              echo "✅ No merge conflict markers found"
+            fi
+
+      - run:
+          name: Validate JSON and CI configs
+          command: |
+            jq empty .claude-plugin/plugin.json && echo "✅ .claude-plugin/plugin.json is valid"
+            jq empty .codex-plugin/plugin.json && echo "✅ .codex-plugin/plugin.json is valid"
+
+            yq eval .circleci/config.yml > /dev/null && echo "✅ .circleci/config.yml is valid"
+
+            for workflow in .github/workflows/*.yml; do
+              echo "Validating $workflow..."
+              yq eval "$workflow" > /dev/null && echo "✅ $workflow is valid"
+            done
+
+  routing-evals:
+    docker:
+      - image: cimg/node:20.19
+    resource_class: small
+    steps:
+      - checkout
+
+      - run:
+          name: Run TF-IDF routing + collision evals
+          # --min-rank1 is the CI floor: at least this % of eval prompts must
+          # rank their expected skill #1. Raise it as the prompt set matures;
+          # never lower it to make a failing description "pass".
+          # Description collisions >=75% are reported as warnings here; add
+          # --fail-on-collision once the repo's descriptions are deduped.
+          command: node scripts/run-evals.js --min-rank1 75 --collision-threshold 0.75
+
+workflows:
+  test:
+    jobs:
+      - tests-and-validation
+      - routing-evals
